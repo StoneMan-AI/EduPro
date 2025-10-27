@@ -1,0 +1,134 @@
+version: '3.8'
+
+services:
+  # 应用服务
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: edupro-app
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    environment:
+      NODE_ENV: production
+      PORT: 5001
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-edupro_prod}
+      DB_USER: ${DB_USER:-edupro_user}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://yourdomain.com}
+      UPLOAD_DIR: /app/uploads
+      MAX_FILE_SIZE: 10485760
+      ALLOWED_FILE_TYPES: jpg,jpeg,png,gif
+      RATE_LIMIT_WINDOW: 900000
+      RATE_LIMIT_MAX: 100
+    volumes:
+      - uploads_data:/app/uploads
+      - app_logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - edupro_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # 数据库服务
+  db:
+    image: postgres:15-alpine
+    container_name: edupro-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-edupro_prod}
+      POSTGRES_USER: ${DB_USER:-edupro_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/pgdata
+      - ../database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - edupro_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-edupro_user} -d ${DB_NAME:-edupro_prod}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Redis 缓存服务 (可选)
+  redis:
+    image: redis:7-alpine
+    container_name: edupro-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - edupro_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  # Nginx 反向代理
+  nginx:
+    image: nginx:alpine
+    container_name: edupro-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../nginx/edupro.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../frontend/dist:/usr/share/nginx/html:ro
+      - uploads_data:/usr/share/nginx/html/uploads:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/letsencrypt:/var/www/letsencrypt:ro
+    depends_on:
+      - app
+    networks:
+      - edupro_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# 数据卷
+volumes:
+  postgres_data:
+    driver: local
+  uploads_data:
+    driver: local
+  app_logs:
+    driver: local
+  redis_data:
+    driver: local
+
+# 网络
+networks:
+  edupro_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

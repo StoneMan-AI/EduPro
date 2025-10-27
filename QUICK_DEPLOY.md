@@ -1,0 +1,275 @@
+# 🚀 EduPro 快速部署指南
+
+本文档提供 EduPro 试题管理系统的快速部署步骤，适用于有经验的运维人员。
+
+## 📋 准备工作
+
+### 系统要求
+- **操作系统**: Ubuntu 20.04+ / CentOS 8+
+- **内存**: 最小 2GB，推荐 4GB+
+- **存储**: 最小 20GB，推荐 50GB+
+- **域名**: 已解析到服务器 IP (可选)
+
+### 预装软件
+```bash
+# Node.js 18+, PostgreSQL 12+, Nginx, Git
+```
+
+## ⚡ 一键部署
+
+### 1. 下载安装脚本
+```bash
+# 克隆项目
+git clone <your-repository-url> /var/www/edupro
+cd /var/www/edupro
+
+# 设置执行权限
+chmod +x scripts/*.sh
+```
+
+### 2. 二级域名环境初始化 (推荐)
+```bash
+# 适用于已有项目的服务器，使用二级域名部署
+scripts/setup-subdomain.sh -e admin@adddesigngroup.com
+```
+
+**或者使用通用初始化 (全新服务器):**
+```bash
+# 运行环境初始化脚本
+sudo scripts/setup.sh -d edupro.adddesigngroup.com -e admin@adddesigngroup.com
+```
+
+### 3. 配置环境变量
+```bash
+# 创建后端环境变量文件
+cd /var/www/edupro/backend
+
+# 创建 .env 文件
+cat > .env << 'EOF'
+NODE_ENV=production
+PORT=5001
+HOST=0.0.0.0
+
+# 数据库配置
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=edupro_prod
+DB_USER=edupro_user
+DB_PASSWORD=请设置强密码
+DB_DIALECT=postgres
+
+# 安全配置 (使用下面命令生成)
+JWT_SECRET=$(openssl rand -base64 32)
+BCRYPT_ROUNDS=12
+
+# CORS 配置
+CORS_ORIGIN=https://yourdomain.com
+
+# 文件上传配置
+UPLOAD_DIR=/var/www/edupro/uploads
+MAX_FILE_SIZE=10485760
+ALLOWED_FILE_TYPES=jpg,jpeg,png,gif
+
+# 速率限制配置
+RATE_LIMIT_WINDOW=900000
+RATE_LIMIT_MAX=100
+EOF
+
+# 设置文件权限
+chmod 600 .env
+
+# 编辑配置文件
+nano .env
+```
+
+**必须修改的配置项:**
+```bash
+DB_PASSWORD=设置强数据库密码                    # 更改为实际的数据库密码
+CORS_ORIGIN=https://edupro.adddesigngroup.com  # 二级域名
+```
+
+### 4. 部署应用
+```bash
+# 运行部署脚本
+scripts/deploy.sh
+```
+
+### 5. 配置安全
+```bash
+# 运行安全配置脚本
+scripts/security.sh
+```
+
+## 🐳 Docker 快速部署
+
+### 1. 使用 Docker Compose
+```bash
+# 进入项目目录
+cd /var/www/edupro
+
+# 创建环境变量文件
+echo "DB_PASSWORD=$(openssl rand -base64 32)" > .env.prod
+echo "JWT_SECRET=$(openssl rand -base64 32)" >> .env.prod
+
+# 启动所有服务
+docker-compose -f docker/docker-compose.prod.yml --env-file .env.prod up -d
+
+# 查看服务状态
+docker-compose -f docker/docker-compose.prod.yml ps
+```
+
+### 2. 健康检查
+```bash
+# 检查应用健康状态
+curl http://localhost:5001/health
+
+# 查看日志
+docker-compose -f docker/docker-compose.prod.yml logs -f app
+```
+
+## 🔧 配置 Nginx (传统部署)
+
+### 1. 复制配置文件 (二级域名)
+```bash
+sudo cp nginx/edupro.conf /etc/nginx/sites-available/edupro
+sudo ln -s /etc/nginx/sites-available/edupro /etc/nginx/sites-enabled/edupro
+
+# 测试配置 (域名已预配置为 edupro.adddesigngroup.com)
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+### 2. 获取二级域名 SSL 证书
+```bash
+# 使用 Let's Encrypt 为二级域名获取证书
+sudo certbot --nginx -d edupro.adddesigngroup.com
+```
+
+### 3. 多项目配置参考
+如果需要自定义多项目配置，可参考：
+```bash
+# 查看多项目配置示例
+cat nginx/multi-project.conf.example
+```
+
+## 📊 验证部署
+
+### 1. 服务状态检查
+```bash
+# 检查所有服务
+systemctl status nginx postgresql
+pm2 status
+
+# 检查端口
+netstat -tlnp | grep -E ':(80|443|5001|5432)'
+```
+
+### 2. 应用功能测试
+```bash
+# API 健康检查
+curl -f http://localhost:5001/health
+
+# 前端访问测试
+curl -I https://edupro.adddesigngroup.com
+```
+
+### 3. 数据库连接测试
+```bash
+# 测试数据库连接
+psql -h localhost -U edupro_user -d edupro_prod -c "SELECT version();"
+```
+
+## 🚨 常见问题排查
+
+### 端口占用
+```bash
+# 检查端口占用
+sudo netstat -tlnp | grep :5001
+sudo lsof -i :5001
+
+# 杀死占用进程
+sudo kill -9 <PID>
+```
+
+### 权限问题
+```bash
+# 修复文件权限
+sudo chown -R $USER:www-data /var/www/edupro
+sudo chmod -R 755 /var/www/edupro
+sudo chmod -R 775 /var/www/edupro/uploads
+```
+
+### 数据库连接失败
+```bash
+# 检查 PostgreSQL 服务
+sudo systemctl status postgresql
+
+# 检查数据库用户
+sudo -u postgres psql -c "\du"
+
+# 重置数据库密码
+sudo -u postgres psql -c "ALTER USER edupro_user PASSWORD 'new_password';"
+```
+
+### PM2 进程异常
+```bash
+# 查看错误日志
+pm2 logs edupro-backend
+
+# 重启应用
+pm2 restart edupro-backend
+
+# 重新加载配置
+pm2 reload ecosystem.config.js --env production
+```
+
+## 📈 性能优化
+
+### 1. 数据库优化
+```bash
+# 优化 PostgreSQL 配置
+sudo cp docker/postgres/postgresql.conf /etc/postgresql/*/main/
+sudo systemctl restart postgresql
+```
+
+### 2. 启用 HTTP/2 和压缩
+```bash
+# Nginx 配置已包含 gzip 和 HTTP/2
+# 确保 SSL 证书正确配置
+```
+
+### 3. PM2 集群模式
+```bash
+# 已在 ecosystem.config.js 中配置
+# instances: 'max' 启用所有 CPU 核心
+```
+
+## 🔄 更新部署
+
+### 代码更新
+```bash
+# 拉取最新代码并部署
+cd /var/www/edupro
+scripts/deploy.sh
+```
+
+### 配置更新
+```bash
+# 更新环境变量后重启
+pm2 restart edupro-backend
+
+# 更新 Nginx 配置后重载
+sudo nginx -s reload
+```
+
+## 📞 支持
+
+如遇到问题：
+1. 查看日志文件: `/var/log/edupro/`
+2. 检查系统状态: `scripts/monitor.sh`
+3. 生成安全报告: `scripts/security.sh`
+
+---
+
+**预计部署时间**: 15-30 分钟
+**技术要求**: Linux 系统管理基础知识
