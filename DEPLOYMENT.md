@@ -69,7 +69,7 @@ DB_PASSWORD=your_password
 
 # 服务器配置
 NODE_ENV=development
-PORT=5000
+PORT=5001
 
 # 其他配置...
 ```
@@ -83,8 +83,8 @@ PORT=5000
 npm run dev
 
 # 或者分别启动
-npm run backend:dev   # 后端服务 (端口 5000)
-npm run frontend:dev  # 前端服务 (端口 3000)
+npm run backend:dev   # 后端服务 (端口 5001)
+npm run frontend:dev  # 前端服务 (端口 3001)
 ```
 
 #### 5.2 生产环境
@@ -99,9 +99,9 @@ npm run backend:start
 
 ### 6. 访问系统
 
-- 前端地址：http://localhost:3000
-- 后端API：http://localhost:5000/api
-- 健康检查：http://localhost:5000/health
+- 前端地址：http://localhost:3001
+- 后端API：http://localhost:5001/api
+- 健康检查：http://localhost:5001/health
 
 ## 目录结构
 
@@ -165,7 +165,7 @@ EduPro/
    - 确认数据库用户权限
 
 2. **端口被占用**
-   - 检查 5000 和 3000 端口是否被占用
+   - 检查 5001 和 3001 端口是否被占用
    - 修改配置文件中的端口设置
 
 3. **依赖安装失败**
@@ -215,7 +215,7 @@ npm run build
 docker build -t edupro .
 
 # 运行容器
-docker run -p 3000:3000 -p 5000:5000 edupro
+docker run -p 3001:3001 -p 5001:5001 edupro
 ```
 
 ## 安全建议

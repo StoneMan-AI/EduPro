@@ -89,7 +89,7 @@ npm run dev
 
 ## 使用说明
 
-1. 打开浏览器访问 `http://localhost:3000`
+1. 打开浏览器访问 `http://localhost:3001`
 2. 进入题目列表查看所有试题
 3. 点击题目查看题干图和答案图
 4. 为题目选择属性标签（学科、年级、知识点、题型、难度）
@@ -97,8 +97,8 @@ npm run dev
 
 ## API 文档
 
-- 后端API运行在 `http://localhost:5000`
-- 前端开发服务器运行在 `http://localhost:3000`
+- 后端API运行在 `http://localhost:5001`
+- 前端开发服务器运行在 `http://localhost:3001`
 - 支持图片格式：JPG, PNG, GIF
 
 ## 许可证
