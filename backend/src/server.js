@@ -30,7 +30,7 @@ app.use(limiter); // 速率限制
 
 // CORS 配置
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3001',
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3002',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
