@@ -1,0 +1,48 @@
+import React from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { Layout } from 'antd'
+import Sidebar from '@/components/Layout/Sidebar'
+import Header from '@/components/Layout/Header'
+import Questions from '@/pages/Questions'
+import KnowledgePoints from '@/pages/KnowledgePoints'
+import Config from '@/pages/Config'
+import Uploads from '@/pages/Uploads'
+import './App.css'
+
+const { Content } = Layout
+
+function App() {
+  return (
+    <Layout style={{ minHeight: '100vh' }}>
+      {/* 侧边栏 */}
+      <Sidebar />
+      
+      {/* 主要内容区域 */}
+      <Layout>
+        {/* 顶部导航 */}
+        <Header />
+        
+        {/* 内容区域 */}
+        <Content style={{ margin: '16px' }}>
+          <div style={{ 
+            padding: '24px', 
+            background: '#fff', 
+            minHeight: '360px',
+            borderRadius: '8px'
+          }}>
+            <Routes>
+              <Route path="/" element={<Navigate to="/questions" replace />} />
+              <Route path="/questions" element={<Questions />} />
+              <Route path="/knowledge-points" element={<KnowledgePoints />} />
+              <Route path="/config" element={<Config />} />
+              <Route path="/uploads" element={<Uploads />} />
+              <Route path="*" element={<Navigate to="/questions" replace />} />
+            </Routes>
+          </div>
+        </Content>
+      </Layout>
+    </Layout>
+  )
+}
+
+export default App

@@ -1,0 +1,32 @@
+{
+  "name": "edupro",
+  "version": "1.0.0",
+  "description": "试题后台管理系统 - React.js + Node.js + Express + PostgreSQL",
+  "scripts": {
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "backend:dev": "cd backend && npm run dev",
+    "frontend:dev": "cd frontend && npm run dev",
+    "backend:start": "cd backend && npm start",
+    "frontend:build": "cd frontend && npm run build",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "setup": "npm run install:all && npm run db:setup",
+    "db:setup": "echo '请确保PostgreSQL数据库已创建，并运行 database/schema.sql 文件'"
+  },
+  "keywords": [
+    "education",
+    "question-management",
+    "react",
+    "nodejs",
+    "express",
+    "postgresql"
+  ],
+  "author": "EduPro Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
