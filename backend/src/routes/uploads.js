@@ -5,7 +5,7 @@ const fs = require('fs').promises;
 const router = express.Router();
 
 // 确保上传目录存在
-const uploadDir = path.join(__dirname, '../../uploads');
+const uploadDir = path.join(__dirname, '../../../uploads');
 console.log('📂 上传目录路径:', uploadDir);
 
 // 同步创建目录（如果不存在）
