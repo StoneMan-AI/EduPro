@@ -163,17 +163,47 @@ function QuestionForm({
       const values = await form.validateFields()
       
       // 上传图片（如果有新选择的图片）
-      let questionImageUrl = questionImagePreview
-      let answerImageUrl = answerImagePreview
+      let questionImageUrl = ''
+      let answerImageUrl = ''
       
+      // 处理题干图片
       if (questionImageFile) {
-        const response = await questionAPI.uploadImage(questionImageFile)
-        questionImageUrl = response.url
+        // 新选择的图片，需要上传
+        try {
+          const response = await questionAPI.uploadImage(questionImageFile)
+          questionImageUrl = response.url || response.data?.url
+          console.log('题干图片上传成功:', questionImageUrl)
+          if (!questionImageUrl) {
+            throw new Error('图片上传响应中没有URL')
+          }
+        } catch (error) {
+          console.error('题干图片上传失败:', error)
+          message.error('题干图片上传失败，请重试')
+          return
+        }
+      } else if (questionImagePreview && questionImagePreview.startsWith('http')) {
+        // 编辑模式下的现有图片URL
+        questionImageUrl = questionImagePreview
       }
       
+      // 处理答案图片
       if (answerImageFile) {
-        const response = await questionAPI.uploadImage(answerImageFile)
-        answerImageUrl = response.url
+        // 新选择的图片，需要上传
+        try {
+          const response = await questionAPI.uploadImage(answerImageFile)
+          answerImageUrl = response.url || response.data?.url
+          console.log('答案图片上传成功:', answerImageUrl)
+          if (!answerImageUrl) {
+            throw new Error('图片上传响应中没有URL')
+          }
+        } catch (error) {
+          console.error('答案图片上传失败:', error)
+          message.error('答案图片上传失败，请重试')
+          return
+        }
+      } else if (answerImagePreview && answerImagePreview.startsWith('http')) {
+        // 编辑模式下的现有图片URL
+        answerImageUrl = answerImagePreview
       }
       
       const data = {
@@ -182,9 +212,13 @@ function QuestionForm({
         answer_image_url: answerImageUrl
       }
       
+      console.log('提交题目数据:', data)
+      console.log('题干图片URL:', questionImageUrl)
+      console.log('答案图片URL:', answerImageUrl)
       mutation.mutate(data)
     } catch (error) {
       console.error('表单验证失败:', error)
+      message.error('表单验证失败，请检查输入')
     }
   }
 
