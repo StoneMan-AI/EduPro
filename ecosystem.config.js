@@ -40,7 +40,7 @@ module.exports = {
     
     // 异常处理
     catch_exceptions: true,
-    ignore_watch: ['node_modules', 'backend/uploads', 'logs'],
+    ignore_watch: ['node_modules', 'backend/src/uploads', 'logs'],
     
     // 高级配置
     node_args: [

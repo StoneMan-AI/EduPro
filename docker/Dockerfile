@@ -65,8 +65,8 @@ COPY --from=builder --chown=nodeuser:nodejs /app/ecosystem.config.js ./
 COPY --from=builder --chown=nodeuser:nodejs /app/frontend/dist ./frontend/dist
 
 # 创建必要目录
-RUN mkdir -p backend/uploads logs \
-    && chown -R nodeuser:nodejs backend/uploads logs
+RUN mkdir -p backend/src/uploads logs \
+    && chown -R nodeuser:nodejs backend/src/uploads logs
 
 # 设置环境变量
 ENV NODE_ENV=production \
