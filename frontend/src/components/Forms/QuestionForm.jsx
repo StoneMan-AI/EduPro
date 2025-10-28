@@ -105,10 +105,14 @@ function QuestionForm({
         })
         setSelectedSubjectId(question.subject_id)
         setSelectedGradeId(question.grade_id)
-        setQuestionImagePreview(question.question_image_url || '')
-        setAnswerImagePreview(question.answer_image_url || '')
-        console.log('设置图片预览 - 题干:', question.question_image_url)
-        console.log('设置图片预览 - 答案:', question.answer_image_url)
+        const questionImageUrl = question.question_image_url || ''
+        const answerImageUrl = question.answer_image_url || ''
+        setQuestionImagePreview(questionImageUrl)
+        setAnswerImagePreview(answerImageUrl)
+        console.log('设置图片预览 - 题干:', questionImageUrl)
+        console.log('设置图片预览 - 答案:', answerImageUrl)
+        console.log('题干图片URL类型:', typeof questionImageUrl)
+        console.log('答案图片URL类型:', typeof answerImageUrl)
         setQuestionImageFile(null)
         setAnswerImageFile(null)
       } else {
@@ -197,7 +201,7 @@ function QuestionForm({
         }
       } else if (isEdit) {
         // 编辑模式：检查图片是否被删除
-        if (questionImagePreview && questionImagePreview.startsWith('http')) {
+        if (questionImagePreview && questionImagePreview.length > 0) {
           // 保持原有图片URL（未修改）
           questionImageUrl = questionImagePreview
           console.log('题干图片未修改，保持原有URL:', questionImageUrl)
@@ -229,7 +233,7 @@ function QuestionForm({
         }
       } else if (isEdit) {
         // 编辑模式：检查图片是否被删除
-        if (answerImagePreview && answerImagePreview.startsWith('http')) {
+        if (answerImagePreview && answerImagePreview.length > 0) {
           // 保持原有图片URL（未修改）
           answerImageUrl = answerImagePreview
           console.log('答案图片未修改，保持原有URL:', answerImageUrl)
@@ -261,6 +265,10 @@ function QuestionForm({
       console.log('答案图片预览:', answerImagePreview)
       console.log('题干图片文件:', questionImageFile)
       console.log('答案图片文件:', answerImageFile)
+      console.log('题干图片预览长度:', questionImagePreview?.length)
+      console.log('答案图片预览长度:', answerImagePreview?.length)
+      console.log('题干图片预览类型:', typeof questionImagePreview)
+      console.log('答案图片预览类型:', typeof answerImagePreview)
       console.log('========================')
       mutation.mutate(data)
     } catch (error) {
