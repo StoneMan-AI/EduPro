@@ -51,7 +51,8 @@ CREATE TABLE difficulty_levels (
     code VARCHAR(10) NOT NULL UNIQUE,
     level_value INTEGER NOT NULL UNIQUE,
     description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 题目表
