@@ -15,7 +15,8 @@ import {
 import {
   PlusOutlined,
   DeleteOutlined,
-  EyeOutlined
+  EyeOutlined,
+  LoadingOutlined
 } from '@ant-design/icons'
 import { useMutation } from 'react-query'
 import api from '@/services/api'
@@ -50,10 +51,10 @@ function QuestionForm({
   onCancel
 }) {
   const [form] = Form.useForm()
-  const [questionImageUrl, setQuestionImageUrl] = useState('')
-  const [answerImageUrl, setAnswerImageUrl] = useState('')
-  const [uploadingQuestion, setUploadingQuestion] = useState(false)
-  const [uploadingAnswer, setUploadingAnswer] = useState(false)
+  const [questionImageFile, setQuestionImageFile] = useState(null)
+  const [answerImageFile, setAnswerImageFile] = useState(null)
+  const [questionImagePreview, setQuestionImagePreview] = useState('')
+  const [answerImagePreview, setAnswerImagePreview] = useState('')
   const [selectedSubjectId, setSelectedSubjectId] = useState(null)
   const [selectedGradeId, setSelectedGradeId] = useState(null)
 
@@ -101,21 +102,25 @@ function QuestionForm({
         })
         setSelectedSubjectId(question.subject_id)
         setSelectedGradeId(question.grade_id)
-        setQuestionImageUrl(question.question_image_url || '')
-        setAnswerImageUrl(question.answer_image_url || '')
+        setQuestionImagePreview(question.question_image_url || '')
+        setAnswerImagePreview(question.answer_image_url || '')
+        setQuestionImageFile(null)
+        setAnswerImageFile(null)
       } else {
         // 新增模式
         form.resetFields()
         setSelectedSubjectId(null)
         setSelectedGradeId(null)
-        setQuestionImageUrl('')
-        setAnswerImageUrl('')
+        setQuestionImagePreview('')
+        setAnswerImagePreview('')
+        setQuestionImageFile(null)
+        setAnswerImageFile(null)
       }
     }
   }, [visible, question, form])
 
-  // 图片上传处理
-  const handleImageUpload = async (file, type) => {
+  // 图片选择处理（只预览，不上传）
+  const handleImageSelect = (file, type) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/gif'
     if (!isJpgOrPng) {
       message.error('只能上传 JPG/PNG/GIF 格式的图片!')
@@ -127,30 +132,15 @@ function QuestionForm({
       return false
     }
 
-    try {
-      if (type === 'question') {
-        setUploadingQuestion(true)
-      } else {
-        setUploadingAnswer(true)
-      }
-
-      const response = await questionAPI.uploadImage(file)
-      
-      if (type === 'question') {
-        setQuestionImageUrl(response.url)
-        message.success('题干图片上传成功')
-      } else {
-        setAnswerImageUrl(response.url)
-        message.success('答案图片上传成功')
-      }
-    } catch (error) {
-      message.error('图片上传失败')
-    } finally {
-      if (type === 'question') {
-        setUploadingQuestion(false)
-      } else {
-        setUploadingAnswer(false)
-      }
+    // 创建预览URL
+    const previewUrl = URL.createObjectURL(file)
+    
+    if (type === 'question') {
+      setQuestionImageFile(file)
+      setQuestionImagePreview(previewUrl)
+    } else {
+      setAnswerImageFile(file)
+      setAnswerImagePreview(previewUrl)
     }
 
     return false // 阻止默认上传行为
@@ -159,22 +149,43 @@ function QuestionForm({
   // 删除图片
   const handleRemoveImage = (type) => {
     if (type === 'question') {
-      setQuestionImageUrl('')
+      setQuestionImageFile(null)
+      setQuestionImagePreview('')
     } else {
-      setAnswerImageUrl('')
+      setAnswerImageFile(null)
+      setAnswerImagePreview('')
     }
   }
 
   // 表单提交
-  const handleSubmit = () => {
-    form.validateFields().then((values) => {
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields()
+      
+      // 上传图片（如果有新选择的图片）
+      let questionImageUrl = questionImagePreview
+      let answerImageUrl = answerImagePreview
+      
+      if (questionImageFile) {
+        const response = await questionAPI.uploadImage(questionImageFile)
+        questionImageUrl = response.url
+      }
+      
+      if (answerImageFile) {
+        const response = await questionAPI.uploadImage(answerImageFile)
+        answerImageUrl = response.url
+      }
+      
       const data = {
         ...values,
         question_image_url: questionImageUrl,
         answer_image_url: answerImageUrl
       }
+      
       mutation.mutate(data)
-    })
+    } catch (error) {
+      console.error('表单验证失败:', error)
+    }
   }
 
   // 学科改变时重置知识点
@@ -189,9 +200,9 @@ function QuestionForm({
     form.setFieldValue('knowledge_point_id', undefined)
   }
 
-  const uploadButton = (loading) => (
+  const uploadButton = (
     <div>
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      <PlusOutlined />
       <div style={{ marginTop: 8 }}>
         点击上传
       </div>
@@ -222,12 +233,12 @@ function QuestionForm({
             <Col span={12}>
               <Form.Item label="题干图片">
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  {questionImageUrl ? (
+                  {questionImagePreview ? (
                     <div style={{ position: 'relative' }}>
                       <Image
                         width={200}
                         height={150}
-                        src={questionImageUrl}
+                        src={questionImagePreview}
                         style={{ objectFit: 'cover', borderRadius: 8 }}
                         preview={{
                           mask: <EyeOutlined />
@@ -249,7 +260,7 @@ function QuestionForm({
                   ) : (
                     <Upload
                       showUploadList={false}
-                      beforeUpload={(file) => handleImageUpload(file, 'question')}
+                      beforeUpload={(file) => handleImageSelect(file, 'question')}
                     >
                       <div
                         style={{
@@ -277,12 +288,12 @@ function QuestionForm({
             <Col span={12}>
               <Form.Item label="答案图片">
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  {answerImageUrl ? (
+                  {answerImagePreview ? (
                     <div style={{ position: 'relative' }}>
                       <Image
                         width={200}
                         height={150}
-                        src={answerImageUrl}
+                        src={answerImagePreview}
                         style={{ objectFit: 'cover', borderRadius: 8 }}
                         preview={{
                           mask: <EyeOutlined />
@@ -304,7 +315,7 @@ function QuestionForm({
                   ) : (
                     <Upload
                       showUploadList={false}
-                      beforeUpload={(file) => handleImageUpload(file, 'answer')}
+                      beforeUpload={(file) => handleImageSelect(file, 'answer')}
                     >
                       <div
                         style={{
