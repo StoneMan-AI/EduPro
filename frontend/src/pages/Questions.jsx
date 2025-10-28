@@ -465,7 +465,10 @@ function Questions() {
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
-                onClick={() => setIsModalVisible(true)}
+                onClick={() => {
+                  setCurrentQuestion(null)
+                  setIsModalVisible(true)
+                }}
               >
                 添加题目
               </Button>

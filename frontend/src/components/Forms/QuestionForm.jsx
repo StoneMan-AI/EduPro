@@ -117,15 +117,39 @@ function QuestionForm({
         setAnswerImageFile(null)
       } else {
         // 新增模式
-        console.log('新增模式')
-        form.resetFields()
+        console.log('新增模式 - 清空所有状态')
+        // 先清空所有状态
         setSelectedSubjectId(null)
         setSelectedGradeId(null)
         setQuestionImagePreview('')
         setAnswerImagePreview('')
         setQuestionImageFile(null)
         setAnswerImageFile(null)
+        // 然后重置表单
+        form.resetFields()
+        // 强制设置默认值
+        form.setFieldsValue({
+          title: '',
+          subject_id: undefined,
+          grade_id: undefined,
+          knowledge_point_id: undefined,
+          question_type_id: undefined,
+          difficulty_id: undefined,
+          status: '已发布',
+          remarks: ''
+        })
+        console.log('新增模式 - 状态已清空')
       }
+    } else {
+      // 弹框关闭时，清空所有状态
+      console.log('弹框关闭 - 清空所有状态')
+      setSelectedSubjectId(null)
+      setSelectedGradeId(null)
+      setQuestionImagePreview('')
+      setAnswerImagePreview('')
+      setQuestionImageFile(null)
+      setAnswerImageFile(null)
+      form.resetFields()
     }
   }, [visible, question, form])
 
