@@ -77,6 +77,7 @@ function Questions() {
   // 安全处理题目数据
   const questions = questionsData?.data || []
   const pagination = questionsData?.pagination || { total: 0, page: 1, page_size: 20 }
+  const total = pagination.total || 0
 
   // 获取配置数据
   const { data: subjectsData } = useQuery('subjects', questionsAPI.getSubjects)
