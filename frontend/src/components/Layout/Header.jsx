@@ -28,20 +28,7 @@ function Header() {
   }
 
   return (
-    <AntHeader
-      style={{
-        background: '#fff',
-        padding: '0 24px',
-        boxShadow: '0 1px 4px rgba(0,21,41,.08)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginLeft: 200, // 侧边栏宽度
-        position: 'sticky',
-        top: 0,
-        zIndex: 10
-      }}
-    >
+    <AntHeader className="app-header">
       {/* 页面标题 */}
       <div>
         <Title level={4} style={{ margin: 0, color: 'rgba(0, 0, 0, 0.85)' }}>

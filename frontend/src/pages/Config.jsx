@@ -65,10 +65,16 @@ function Config() {
   const [modalType, setModalType] = useState('subjects')
 
   // 数据查询
-  const { data: subjects = [], refetch: refetchSubjects } = useQuery('subjects', configAPI.getSubjects)
-  const { data: grades = [], refetch: refetchGrades } = useQuery('grades', configAPI.getGrades)
-  const { data: questionTypes = [], refetch: refetchQuestionTypes } = useQuery('questionTypes', configAPI.getQuestionTypes)
-  const { data: difficultyLevels = [], refetch: refetchDifficultyLevels } = useQuery('difficultyLevels', configAPI.getDifficultyLevels)
+  const { data: subjectsData, refetch: refetchSubjects } = useQuery('subjects', configAPI.getSubjects)
+  const { data: gradesData, refetch: refetchGrades } = useQuery('grades', configAPI.getGrades)
+  const { data: questionTypesData, refetch: refetchQuestionTypes } = useQuery('questionTypes', configAPI.getQuestionTypes)
+  const { data: difficultyLevelsData, refetch: refetchDifficultyLevels } = useQuery('difficultyLevels', configAPI.getDifficultyLevels)
+
+  // 安全处理数据，确保是数组格式
+  const subjects = Array.isArray(subjectsData?.data) ? subjectsData.data : []
+  const grades = Array.isArray(gradesData?.data) ? gradesData.data : []
+  const questionTypes = Array.isArray(questionTypesData?.data) ? questionTypesData.data : []
+  const difficultyLevels = Array.isArray(difficultyLevelsData?.data) ? difficultyLevelsData.data : []
 
   // 通用的增删改 mutation
   const mutation = useMutation(

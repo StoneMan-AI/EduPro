@@ -46,14 +46,7 @@ function Sidebar() {
     <Sider
       width={200}
       theme="dark"
-      style={{
-        overflow: 'auto',
-        height: '100vh',
-        position: 'fixed',
-        left: 0,
-        top: 0,
-        bottom: 0,
-      }}
+      className="app-sider"
     >
       {/* Logo */}
       <div className="logo">
@@ -67,7 +60,7 @@ function Sidebar() {
         selectedKeys={[location.pathname]}
         items={menuItems}
         onClick={handleMenuClick}
-        style={{ borderRight: 0 }}
+        className="app-menu"
       />
     </Sider>
   )

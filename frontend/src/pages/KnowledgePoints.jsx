@@ -48,7 +48,7 @@ function KnowledgePoints() {
 
   // 获取知识点列表
   const [selectedGrade, setSelectedGrade] = useState(null)
-  const { data: knowledgePoints = [], isLoading, refetch } = useQuery(
+  const { data: knowledgePointsData, isLoading, refetch } = useQuery(
     ['knowledgePoints', selectedSubject, selectedGrade],
     () => knowledgePointsAPI.getKnowledgePoints({ 
       subject_id: selectedSubject,
@@ -60,10 +60,15 @@ function KnowledgePoints() {
   )
 
   // 获取学科列表和年级列表
-  const { data: subjects = [] } = useQuery('subjects', knowledgePointsAPI.getSubjects)
-  const { data: grades = [] } = useQuery('grades', () => 
+  const { data: subjectsData } = useQuery('subjects', knowledgePointsAPI.getSubjects)
+  const { data: gradesData } = useQuery('grades', () => 
     api.get('/config/grades').then(res => res.data || [])
   )
+
+  // 安全处理数据，确保是数组格式
+  const knowledgePoints = Array.isArray(knowledgePointsData?.data) ? knowledgePointsData.data : []
+  const subjects = Array.isArray(subjectsData?.data) ? subjectsData.data : []
+  const grades = Array.isArray(gradesData?.data) ? gradesData.data : []
 
   // 创建/更新知识点
   const mutation = useMutation(

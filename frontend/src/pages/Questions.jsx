@@ -87,11 +87,11 @@ function Questions() {
   const { data: knowledgePointsData } = useQuery('knowledgePoints', questionsAPI.getKnowledgePoints)
 
   // 安全处理数据，确保是数组格式
-  const subjects = Array.isArray(subjectsData) ? subjectsData : []
-  const grades = Array.isArray(gradesData) ? gradesData : []
-  const questionTypes = Array.isArray(questionTypesData) ? questionTypesData : []
-  const difficultyLevels = Array.isArray(difficultyLevelsData) ? difficultyLevelsData : []
-  const knowledgePoints = Array.isArray(knowledgePointsData) ? knowledgePointsData : []
+  const subjects = Array.isArray(subjectsData?.data) ? subjectsData.data : []
+  const grades = Array.isArray(gradesData?.data) ? gradesData.data : []
+  const questionTypes = Array.isArray(questionTypesData?.data) ? questionTypesData.data : []
+  const difficultyLevels = Array.isArray(difficultyLevelsData?.data) ? difficultyLevelsData.data : []
+  const knowledgePoints = Array.isArray(knowledgePointsData?.data) ? knowledgePointsData.data : []
 
   // 删除题目
   const deleteMutation = useMutation(questionsAPI.deleteQuestion, {
@@ -368,7 +368,7 @@ function Questions() {
   }
 
   const rowSelection = {
-    selectedRowKeys,
+    selectedRowKeys: Array.isArray(selectedRowKeys) ? selectedRowKeys : [],
     onChange: setSelectedRowKeys,
   }
 
@@ -490,7 +490,7 @@ function Questions() {
         <Table
           rowSelection={rowSelection}
           columns={columns}
-          dataSource={questions}
+          dataSource={Array.isArray(questions) ? questions : []}
           rowKey="id"
           loading={isLoading}
           pagination={{

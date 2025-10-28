@@ -13,23 +13,18 @@ const { Content } = Layout
 
 function App() {
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout className="app-layout">
       {/* 侧边栏 */}
       <Sidebar />
       
       {/* 主要内容区域 */}
-      <Layout>
+      <Layout className="app-layout-content">
         {/* 顶部导航 */}
         <Header />
         
         {/* 内容区域 */}
-        <Content style={{ margin: '16px' }}>
-          <div style={{ 
-            padding: '24px', 
-            background: '#fff', 
-            minHeight: '360px',
-            borderRadius: '8px'
-          }}>
+        <Content className="app-content">
+          <div className="content-wrapper">
             <Routes>
               <Route path="/" element={<Navigate to="/questions" replace />} />
               <Route path="/questions" element={<Questions />} />
