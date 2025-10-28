@@ -40,8 +40,8 @@ app.use(cors({
 }));
 
 // 解析中间件
-app.use(express.json({ limit: '20mb' }));
-app.use(express.urlencoded({ extended: true, limit: '20mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // 静态文件服务 (图片上传目录)
 app.use('/uploads', express.static(path.join(__dirname, 'src/uploads')));
