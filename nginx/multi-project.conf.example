@@ -79,7 +79,7 @@ server {
     include /etc/nginx/snippets/ssl-params.conf;
     
     # EduPro 静态文件
-    root /var/www/edupro/frontend/dist;
+    root /opt/EduPro/frontend/dist;
     index index.html;
     
     # 文件上传大小限制
@@ -114,7 +114,7 @@ server {
     
     # 上传文件服务
     location /uploads/ {
-        alias /var/www/edupro/uploads/;
+        alias /opt/EduPro/uploads/;
         expires 1y;
         add_header Cache-Control "public, immutable";
     }

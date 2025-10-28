@@ -13,8 +13,8 @@
 ### 1. 克隆项目
 ```bash
 # 克隆项目到指定目录
-git clone <your-repository-url> /var/www/edupro
-cd /var/www/edupro
+git clone <your-repository-url> /opt/EduPro
+cd /opt/EduPro
 ```
 
 ### 2. 安装依赖
@@ -45,7 +45,7 @@ psql -h localhost -U edupro_user -d edupro_prod -f database/schema.sql
 ### 4. 配置环境变量
 ```bash
 # 创建后端环境变量文件
-cd /var/www/edupro/backend
+cd /opt/EduPro/backend
 nano .env
 ```
 
@@ -71,7 +71,7 @@ BCRYPT_ROUNDS=12
 CORS_ORIGIN=https://yourdomain.com
 
 # 文件上传配置
-UPLOAD_DIR=/var/www/edupro/uploads
+UPLOAD_DIR=/opt/EduPro/uploads
 MAX_FILE_SIZE=10485760
 ALLOWED_FILE_TYPES=jpg,jpeg,png,gif
 

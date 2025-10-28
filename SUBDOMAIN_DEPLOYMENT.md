@@ -22,8 +22,8 @@ Internet → Nginx →
 ### 1. 克隆项目
 ```bash
 # 克隆到指定目录
-git clone <repository-url> /var/www/edupro
-cd /var/www/edupro
+git clone <repository-url> /opt/EduPro
+cd /opt/EduPro
 ```
 
 ### 2. 安装依赖
@@ -54,7 +54,7 @@ psql -h localhost -U edupro_user -d edupro_prod -f database/schema.sql
 ### 4. 配置环境变量
 ```bash
 # 创建后端环境变量文件
-cd /var/www/edupro/backend
+cd /opt/EduPro/backend
 nano .env
 ```
 
@@ -71,7 +71,7 @@ DB_PASSWORD=your_password
 DB_DIALECT=postgres
 JWT_SECRET=your_jwt_secret
 CORS_ORIGIN=https://edupro.adddesigngroup.com
-UPLOAD_DIR=/var/www/edupro/uploads
+UPLOAD_DIR=/opt/EduPro/uploads
 ```
 
 ### 5. 配置 Nginx（HTTP 模式）
@@ -102,7 +102,7 @@ sudo certbot --nginx -d edupro.adddesigngroup.com
 sudo npm install -g pm2
 
 # 启动应用
-cd /var/www/edupro
+cd /opt/EduPro
 pm2 start ecosystem.config.js --env production
 pm2 save
 pm2 startup

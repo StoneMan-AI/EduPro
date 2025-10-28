@@ -151,11 +151,11 @@ psql -h localhost -U edupro_user -d edupro_prod -f database/schema.sql
 ### 1. 创建项目目录
 ```bash
 # 创建项目目录
-sudo mkdir -p /var/www/edupro
-sudo chown $USER:$USER /var/www/edupro
+sudo mkdir -p /opt/EduPro
+sudo chown $USER:$USER /opt/EduPro
 
 # 创建子目录
-mkdir -p /var/www/edupro/{uploads,logs}
+mkdir -p /opt/EduPro/{uploads,logs}
 mkdir -p /var/log/edupro
 mkdir -p /var/backups/edupro
 ```
@@ -186,7 +186,7 @@ npm list --depth=0
 ### 4. 安装前端依赖并构建
 ```bash
 # 进入前端目录
-cd /var/www/edupro/frontend
+cd EduPro/frontend
 
 # 安装依赖
 npm ci
@@ -232,7 +232,7 @@ BCRYPT_ROUNDS=12
 CORS_ORIGIN=https://edupro.adddesigngroup.com
 
 # 文件上传配置
-UPLOAD_DIR=/var/www/edupro/uploads
+UPLOAD_DIR=/opt/EduPro/uploads
 MAX_FILE_SIZE=10485760
 ALLOWED_FILE_TYPES=jpg,jpeg,png,gif
 
