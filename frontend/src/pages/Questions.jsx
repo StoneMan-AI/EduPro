@@ -74,12 +74,23 @@ function Questions() {
     }
   )
 
+  // 安全处理题目数据
+  const questions = questionsData?.data || []
+  const pagination = questionsData?.pagination || { total: 0, page: 1, page_size: 20 }
+
   // 获取配置数据
-  const { data: subjects = [] } = useQuery('subjects', questionsAPI.getSubjects)
-  const { data: grades = [] } = useQuery('grades', questionsAPI.getGrades)
-  const { data: questionTypes = [] } = useQuery('questionTypes', questionsAPI.getQuestionTypes)
-  const { data: difficultyLevels = [] } = useQuery('difficultyLevels', questionsAPI.getDifficultyLevels)
-  const { data: knowledgePoints = [] } = useQuery('knowledgePoints', questionsAPI.getKnowledgePoints)
+  const { data: subjectsData } = useQuery('subjects', questionsAPI.getSubjects)
+  const { data: gradesData } = useQuery('grades', questionsAPI.getGrades)
+  const { data: questionTypesData } = useQuery('questionTypes', questionsAPI.getQuestionTypes)
+  const { data: difficultyLevelsData } = useQuery('difficultyLevels', questionsAPI.getDifficultyLevels)
+  const { data: knowledgePointsData } = useQuery('knowledgePoints', questionsAPI.getKnowledgePoints)
+
+  // 安全处理数据，确保是数组格式
+  const subjects = Array.isArray(subjectsData) ? subjectsData : []
+  const grades = Array.isArray(gradesData) ? gradesData : []
+  const questionTypes = Array.isArray(questionTypesData) ? questionTypesData : []
+  const difficultyLevels = Array.isArray(difficultyLevelsData) ? difficultyLevelsData : []
+  const knowledgePoints = Array.isArray(knowledgePointsData) ? knowledgePointsData : []
 
   // 删除题目
   const deleteMutation = useMutation(questionsAPI.deleteQuestion, {
