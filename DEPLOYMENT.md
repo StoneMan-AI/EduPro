@@ -1,49 +1,52 @@
-# 部署指南
+# 🛠️ EduPro 生产环境部署指南
 
-## 系统要求
+本文档提供 EduPro 试题管理系统的完整生产环境部署步骤，适用于 `edupro.adddesigngroup.com` 二级域名部署。
 
-- Node.js >= 18.0.0
-- npm >= 9.0.0
-- PostgreSQL >= 12.0
+## 📋 系统要求
 
-## 快速开始
+- **操作系统**: Ubuntu 20.04+ / CentOS 8+
+- **内存**: 最小 2GB，推荐 4GB+
+- **存储**: 最小 20GB，推荐 50GB+
+- **Node.js**: >= 18.0.0
+- **PostgreSQL**: >= 12.0
+- **Nginx**: 最新稳定版
 
-### 1. 克隆项目
+## 🚀 快速部署
 
+### 1. 环境准备
 ```bash
-git clone <repository-url>
-cd EduPro
+# 克隆项目
+git clone <repository-url> /var/www/edupro
+cd /var/www/edupro
+
+# 创建必要目录
+sudo mkdir -p /var/www/edupro/{uploads,logs}
+sudo chown -R $USER:$USER /var/www/edupro
 ```
 
 ### 2. 安装依赖
-
 ```bash
-# 安装所有依赖（根目录、前端、后端）
-npm run install:all
+# 安装后端依赖
+cd backend
+npm ci --production
 
-# 或者分别安装
-npm install                 # 根目录依赖
-cd backend && npm install  # 后端依赖
-cd frontend && npm install # 前端依赖
+# 安装前端依赖并构建
+cd ../frontend
+npm ci
+npm run build
 ```
 
 ### 3. 配置数据库
-
-#### 3.1 创建 PostgreSQL 数据库
-
 ```bash
-# 使用 psql 命令行
-createdb edupro_db
+# 创建数据库和用户
+sudo -u postgres psql
+CREATE DATABASE edupro_prod;
+CREATE USER edupro_user WITH ENCRYPTED PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;
+\q
 
-# 或者使用 SQL
-CREATE DATABASE edupro_db;
-```
-
-#### 3.2 导入数据库结构
-
-```bash
-# 导入数据库结构和初始数据
-psql -d edupro_db -f database/schema.sql
+# 导入数据库结构
+psql -h localhost -U edupro_user -d edupro_prod -f database/schema.sql
 ```
 
 ### 4. 配置环境变量

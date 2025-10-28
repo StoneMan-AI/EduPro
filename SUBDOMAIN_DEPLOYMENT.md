@@ -24,35 +24,88 @@ Internet → Nginx →
 # 克隆到指定目录
 git clone <repository-url> /var/www/edupro
 cd /var/www/edupro
-chmod +x scripts/*.sh
 ```
 
-### 2. 运行二级域名配置脚本
+### 2. 安装依赖
 ```bash
-# 一键配置二级域名环境
-scripts/setup-subdomain.sh -e admin@adddesigngroup.com
+# 安装后端依赖
+cd backend
+npm ci --production
+
+# 安装前端依赖并构建
+cd ../frontend
+npm ci
+npm run build
 ```
 
-这个脚本会自动完成：
-- ✅ 检查现有 Nginx 配置兼容性
-- ✅ 配置 PostgreSQL 数据库 (独立数据库)
-- ✅ 创建应用目录结构
-- ✅ 配置 Nginx 二级域名
-- ✅ 获取 SSL 证书
-- ✅ 生成环境变量文件
-- ✅ 配置 PM2 进程管理
-
-### 3. 部署应用代码
+### 3. 配置数据库
 ```bash
-# 安装依赖并部署
-scripts/deploy.sh
-```
+# 创建数据库和用户
+sudo -u postgres psql
+CREATE DATABASE edupro_prod;
+CREATE USER edupro_user WITH ENCRYPTED PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;
+\q
 
-### 4. 导入数据库结构
-```bash
-# 使用生成的数据库凭据
-source ~/.edupro-credentials
+# 导入数据库结构
 psql -h localhost -U edupro_user -d edupro_prod -f database/schema.sql
+```
+
+### 4. 配置环境变量
+```bash
+# 创建后端环境变量文件
+cd /var/www/edupro/backend
+nano .env
+```
+
+**添加以下配置:**
+```bash
+NODE_ENV=production
+PORT=5001
+HOST=0.0.0.0
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=edupro_prod
+DB_USER=edupro_user
+DB_PASSWORD=your_password
+DB_DIALECT=postgres
+JWT_SECRET=your_jwt_secret
+CORS_ORIGIN=https://edupro.adddesigngroup.com
+UPLOAD_DIR=/var/www/edupro/uploads
+```
+
+### 5. 配置 Nginx（HTTP 模式）
+```bash
+# 复制 Nginx 配置
+sudo cp nginx/edupro.conf /etc/nginx/sites-available/edupro
+sudo ln -s /etc/nginx/sites-available/edupro /etc/nginx/sites-enabled/
+
+# 测试配置
+sudo nginx -t
+sudo nginx -s reload
+```
+
+### 6. 获取 SSL 证书
+```bash
+# 安装 Certbot
+sudo apt install -y certbot python3-certbot-nginx
+
+# 获取 SSL 证书（会自动修改配置文件添加 HTTPS 支持）
+sudo certbot --nginx -d edupro.adddesigngroup.com
+```
+
+**故障排除：** 如果遇到 SSL 证书文件不存在的错误，请确保域名解析正确，然后重新运行 certbot 命令。
+
+### 7. 启动应用
+```bash
+# 安装 PM2
+sudo npm install -g pm2
+
+# 启动应用
+cd /var/www/edupro
+pm2 start ecosystem.config.js --env production
+pm2 save
+pm2 startup
 ```
 
 ## 🔧 手动配置 (高级用户)
