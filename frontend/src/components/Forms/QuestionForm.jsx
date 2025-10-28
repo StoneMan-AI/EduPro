@@ -155,9 +155,17 @@ function QuestionForm({
     if (type === 'question') {
       setQuestionImageFile(null)
       setQuestionImagePreview('')
+      // 在编辑模式下，清空图片预览表示要删除图片
+      if (isEdit) {
+        console.log('删除题干图片')
+      }
     } else {
       setAnswerImageFile(null)
       setAnswerImagePreview('')
+      // 在编辑模式下，清空图片预览表示要删除图片
+      if (isEdit) {
+        console.log('删除答案图片')
+      }
     }
   }
 
@@ -166,7 +174,7 @@ function QuestionForm({
     try {
       const values = await form.validateFields()
       
-      // 上传图片（如果有新选择的图片）
+      // 初始化图片URL
       let questionImageUrl = ''
       let answerImageUrl = ''
       
@@ -185,9 +193,21 @@ function QuestionForm({
           message.error('题干图片上传失败，请重试')
           return
         }
+      } else if (isEdit) {
+        // 编辑模式：检查图片是否被删除
+        if (questionImagePreview && questionImagePreview.startsWith('http')) {
+          // 保持原有图片URL（未修改）
+          questionImageUrl = question.question_image_url
+          console.log('题干图片未修改，保持原有URL:', questionImageUrl)
+        } else {
+          // 图片被删除，设置为空字符串
+          questionImageUrl = ''
+          console.log('题干图片已删除')
+        }
       } else if (questionImagePreview && questionImagePreview.startsWith('http')) {
-        // 编辑模式下的现有图片URL
+        // 新增模式：使用预览URL
         questionImageUrl = questionImagePreview
+        console.log('新增模式题干图片URL:', questionImageUrl)
       }
       
       // 处理答案图片
@@ -205,9 +225,21 @@ function QuestionForm({
           message.error('答案图片上传失败，请重试')
           return
         }
+      } else if (isEdit) {
+        // 编辑模式：检查图片是否被删除
+        if (answerImagePreview && answerImagePreview.startsWith('http')) {
+          // 保持原有图片URL（未修改）
+          answerImageUrl = question.answer_image_url
+          console.log('答案图片未修改，保持原有URL:', answerImageUrl)
+        } else {
+          // 图片被删除，设置为空字符串
+          answerImageUrl = ''
+          console.log('答案图片已删除')
+        }
       } else if (answerImagePreview && answerImagePreview.startsWith('http')) {
-        // 编辑模式下的现有图片URL
+        // 新增模式：使用预览URL
         answerImageUrl = answerImagePreview
+        console.log('新增模式答案图片URL:', answerImageUrl)
       }
       
       const data = {
@@ -219,6 +251,11 @@ function QuestionForm({
       console.log('提交题目数据:', data)
       console.log('题干图片URL:', questionImageUrl)
       console.log('答案图片URL:', answerImageUrl)
+      console.log('编辑模式:', isEdit)
+      console.log('原有题干图片URL:', question?.question_image_url)
+      console.log('原有答案图片URL:', question?.answer_image_url)
+      console.log('题干图片预览:', questionImagePreview)
+      console.log('答案图片预览:', answerImagePreview)
       mutation.mutate(data)
     } catch (error) {
       console.error('表单验证失败:', error)
