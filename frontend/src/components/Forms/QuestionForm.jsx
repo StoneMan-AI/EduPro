@@ -258,7 +258,7 @@ function QuestionForm({
         form={form}
         layout="vertical"
         initialValues={{
-          status: '未处理'
+          status: question ? question.status : '已发布'
         }}
       >
         {/* 图片上传区域 */}
@@ -480,6 +480,21 @@ function QuestionForm({
                       {level.name}
                     </Option>
                   ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            
+            <Col span={12}>
+              <Form.Item
+                name="status"
+                label="状态"
+                rules={[{ required: true, message: '请选择状态' }]}
+              >
+                <Select placeholder="请选择状态">
+                  <Option value="未处理">未处理</Option>
+                  <Option value="已标注">已标注</Option>
+                  <Option value="已审核">已审核</Option>
+                  <Option value="已发布">已发布</Option>
                 </Select>
               </Form.Item>
             </Col>

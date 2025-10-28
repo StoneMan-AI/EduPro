@@ -49,7 +49,7 @@ module.exports = (sequelize) => {
     },
     status: {
       type: DataTypes.ENUM('未处理', '已标注', '已审核', '已发布'),
-      defaultValue: '未处理',
+      defaultValue: '已发布',
       comment: '处理状态'
     },
     tags: {

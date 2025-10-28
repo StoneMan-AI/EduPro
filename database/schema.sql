@@ -66,7 +66,7 @@ CREATE TABLE questions (
     knowledge_point_id INTEGER REFERENCES knowledge_points(id) ON DELETE SET NULL,
     question_type_id INTEGER REFERENCES question_types(id) ON DELETE SET NULL,
     difficulty_id INTEGER REFERENCES difficulty_levels(id) ON DELETE SET NULL,
-    status VARCHAR(20) DEFAULT '未处理' CHECK (status IN ('未处理', '已标注', '已审核', '已发布')),
+    status VARCHAR(20) DEFAULT '已发布' CHECK (status IN ('未处理', '已标注', '已审核', '已发布')),
     tags TEXT[], -- 额外标签（数组格式）
     remarks TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
