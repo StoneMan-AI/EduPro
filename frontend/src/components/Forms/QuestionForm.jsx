@@ -91,6 +91,8 @@ function QuestionForm({
     if (visible) {
       if (question) {
         // 编辑模式
+        console.log('编辑模式，题目数据:', question)
+        console.log('题目状态:', question.status)
         form.setFieldsValue({
           title: question.title,
           subject_id: question.subject_id,
@@ -98,6 +100,7 @@ function QuestionForm({
           knowledge_point_id: question.knowledge_point_id,
           question_type_id: question.question_type_id,
           difficulty_id: question.difficulty_id,
+          status: question.status,
           remarks: question.remarks
         })
         setSelectedSubjectId(question.subject_id)
@@ -108,6 +111,7 @@ function QuestionForm({
         setAnswerImageFile(null)
       } else {
         // 新增模式
+        console.log('新增模式')
         form.resetFields()
         setSelectedSubjectId(null)
         setSelectedGradeId(null)
@@ -258,8 +262,16 @@ function QuestionForm({
         form={form}
         layout="vertical"
         initialValues={{
-          status: question ? question.status : '已发布'
+          status: question ? question.status : '已发布',
+          title: question?.title || '',
+          subject_id: question?.subject_id || undefined,
+          grade_id: question?.grade_id || undefined,
+          knowledge_point_id: question?.knowledge_point_id || undefined,
+          question_type_id: question?.question_type_id || undefined,
+          difficulty_id: question?.difficulty_id || undefined,
+          remarks: question?.remarks || ''
         }}
+        key={question?.id || 'new'}
       >
         {/* 图片上传区域 */}
         <Card title="图片上传" size="small" style={{ marginBottom: 24 }}>
