@@ -15,6 +15,9 @@ const { notFound } = require('./middleware/notFound');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+// 信任代理设置 (用于Nginx反向代理)
+app.set('trust proxy', true);
+
 // 速率限制
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW) || 15 * 60 * 1000, // 15分钟
