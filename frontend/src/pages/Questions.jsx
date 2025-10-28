@@ -371,9 +371,6 @@ function Questions() {
     onChange: setSelectedRowKeys,
   }
 
-  const questions = questionsData?.data || []
-  const total = questionsData?.total || 0
-
   return (
     <div className="page-container">
       {/* 页面标题 */}

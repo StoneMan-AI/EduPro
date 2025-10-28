@@ -203,7 +203,7 @@ ls -la dist/
 ### 1. 创建后端环境变量文件
 ```bash
 # 进入后端目录
-cd /var/www/edupro/backend
+cd /opt/EduPro/backend
 
 # 创建 .env 文件
 nano .env
