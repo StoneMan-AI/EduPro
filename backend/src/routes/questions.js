@@ -122,6 +122,10 @@ router.put('/:id', async (req, res, next) => {
       });
     }
 
+    console.log('更新题目数据:', req.body);
+    console.log('题干图片URL:', req.body.question_image_url);
+    console.log('答案图片URL:', req.body.answer_image_url);
+    
     await question.update({
       ...req.body,
       updated_by: 'system' // TODO: 从用户信息中获取

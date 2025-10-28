@@ -107,6 +107,8 @@ function QuestionForm({
         setSelectedGradeId(question.grade_id)
         setQuestionImagePreview(question.question_image_url || '')
         setAnswerImagePreview(question.answer_image_url || '')
+        console.log('设置图片预览 - 题干:', question.question_image_url)
+        console.log('设置图片预览 - 答案:', question.answer_image_url)
         setQuestionImageFile(null)
         setAnswerImageFile(null)
       } else {
@@ -197,7 +199,7 @@ function QuestionForm({
         // 编辑模式：检查图片是否被删除
         if (questionImagePreview && questionImagePreview.startsWith('http')) {
           // 保持原有图片URL（未修改）
-          questionImageUrl = question.question_image_url
+          questionImageUrl = questionImagePreview
           console.log('题干图片未修改，保持原有URL:', questionImageUrl)
         } else {
           // 图片被删除，设置为空字符串
@@ -229,7 +231,7 @@ function QuestionForm({
         // 编辑模式：检查图片是否被删除
         if (answerImagePreview && answerImagePreview.startsWith('http')) {
           // 保持原有图片URL（未修改）
-          answerImageUrl = question.answer_image_url
+          answerImageUrl = answerImagePreview
           console.log('答案图片未修改，保持原有URL:', answerImageUrl)
         } else {
           // 图片被删除，设置为空字符串
@@ -248,6 +250,7 @@ function QuestionForm({
         answer_image_url: answerImageUrl
       }
       
+      console.log('=== 提交题目数据 ===')
       console.log('提交题目数据:', data)
       console.log('题干图片URL:', questionImageUrl)
       console.log('答案图片URL:', answerImageUrl)
@@ -256,6 +259,9 @@ function QuestionForm({
       console.log('原有答案图片URL:', question?.answer_image_url)
       console.log('题干图片预览:', questionImagePreview)
       console.log('答案图片预览:', answerImagePreview)
+      console.log('题干图片文件:', questionImageFile)
+      console.log('答案图片文件:', answerImageFile)
+      console.log('========================')
       mutation.mutate(data)
     } catch (error) {
       console.error('表单验证失败:', error)
