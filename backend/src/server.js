@@ -53,6 +53,24 @@ app.get('/health', (req, res) => {
   });
 });
 
+// 根路径处理
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'EduPro 试题管理系统 API 服务',
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: '/health',
+      api: '/api',
+      questions: '/api/questions',
+      knowledgePoints: '/api/knowledge-points',
+      config: '/api/config',
+      uploads: '/api/uploads'
+    }
+  });
+});
+
 // API 路由
 app.use('/api', routes);
 
