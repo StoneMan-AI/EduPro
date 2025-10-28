@@ -4,17 +4,21 @@ const path = require('path');
 const fs = require('fs').promises;
 const router = express.Router();
 
+// 确保上传目录存在
+const uploadDir = path.join(__dirname, '../../uploads');
+console.log('📂 上传目录路径:', uploadDir);
+
+// 同步创建目录（如果不存在）
+try {
+  require('fs').mkdirSync(uploadDir, { recursive: true });
+  console.log('✅ 上传目录已准备就绪');
+} catch (error) {
+  console.log('❌ 创建上传目录失败:', error.message);
+}
+
 // 配置 multer 存储
 const storage = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    const uploadDir = path.join(__dirname, '../../../uploads');
-    
-    try {
-      await fs.access(uploadDir);
-    } catch (error) {
-      await fs.mkdir(uploadDir, { recursive: true });
-    }
-    
+  destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
@@ -49,10 +53,34 @@ const upload = multer({
 // 单文件上传
 router.post('/image', upload.single('file'), async (req, res, next) => {
   try {
+    console.log('📁 文件上传请求:', {
+      hasFile: !!req.file,
+      fileInfo: req.file ? {
+        filename: req.file.filename,
+        originalname: req.file.originalname,
+        size: req.file.size,
+        mimetype: req.file.mimetype,
+        destination: req.file.destination,
+        path: req.file.path
+      } : null
+    });
+
     if (!req.file) {
       return res.status(400).json({
         success: false,
         message: '请选择要上传的文件'
+      });
+    }
+
+    // 验证文件是否真的保存到了磁盘
+    try {
+      await fs.access(req.file.path);
+      console.log('✅ 文件已成功保存到:', req.file.path);
+    } catch (error) {
+      console.error('❌ 文件保存失败:', error);
+      return res.status(500).json({
+        success: false,
+        message: '文件保存失败'
       });
     }
 
@@ -71,6 +99,7 @@ router.post('/image', upload.single('file'), async (req, res, next) => {
       url: fileUrl // 兼容前端组件
     });
   } catch (error) {
+    console.error('❌ 文件上传错误:', error);
     next(error);
   }
 });
@@ -109,7 +138,7 @@ router.post('/batch', upload.array('files', 10), async (req, res, next) => {
 router.delete('/file/:filename', async (req, res, next) => {
   try {
     const { filename } = req.params;
-    const filePath = path.join(__dirname, '../../../uploads', filename);
+    const filePath = path.join(uploadDir, filename);
 
     try {
       await fs.access(filePath);
@@ -134,7 +163,7 @@ router.delete('/file/:filename', async (req, res, next) => {
 router.get('/file/:filename', async (req, res, next) => {
   try {
     const { filename } = req.params;
-    const filePath = path.join(__dirname, '../../../uploads', filename);
+    const filePath = path.join(uploadDir, filename);
 
     try {
       const stats = await fs.stat(filePath);
@@ -163,7 +192,7 @@ router.get('/file/:filename', async (req, res, next) => {
 // 获取上传目录的所有文件
 router.get('/files', async (req, res, next) => {
   try {
-    const uploadDir = path.join(__dirname, '../../../uploads');
+    // 使用已定义的uploadDir
     
     try {
       const files = await fs.readdir(uploadDir);

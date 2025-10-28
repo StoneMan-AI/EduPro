@@ -45,9 +45,11 @@ function KnowledgePoints() {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [currentKnowledgePoint, setCurrentKnowledgePoint] = useState(null)
   const [selectedSubject, setSelectedSubject] = useState(null)
+  const [selectedGrade, setSelectedGrade] = useState(null)
+  const [formSubjectId, setFormSubjectId] = useState(null)
+  const [formGradeId, setFormGradeId] = useState(null)
 
   // 获取知识点列表
-  const [selectedGrade, setSelectedGrade] = useState(null)
   const { data: knowledgePointsData, isLoading, refetch } = useQuery(
     ['knowledgePoints', selectedSubject, selectedGrade],
     () => knowledgePointsAPI.getKnowledgePoints({ 
@@ -217,14 +219,20 @@ function KnowledgePoints() {
   // 事件处理函数
   const handleAdd = () => {
     setCurrentKnowledgePoint(null)
+    setFormSubjectId(null)
+    setFormGradeId(null)
+    form.resetFields()
     setIsModalVisible(true)
   }
 
   const handleEdit = (knowledgePoint) => {
     setCurrentKnowledgePoint(knowledgePoint)
+    setFormSubjectId(knowledgePoint.subject_id)
+    setFormGradeId(knowledgePoint.grade_id)
     form.setFieldsValue({
       name: knowledgePoint.name,
       subject_id: knowledgePoint.subject_id,
+      grade_id: knowledgePoint.grade_id,
       parent_id: knowledgePoint.parent_id,
       description: knowledgePoint.description,
       is_active: knowledgePoint.is_active
@@ -256,14 +264,12 @@ function KnowledgePoints() {
 
   // 获取父知识点选项
   const getParentOptions = () => {
-    const subjectId = form.getFieldValue('subject_id')
-    const gradeId = form.getFieldValue('grade_id')
-    if (!subjectId || !gradeId) return []
+    if (!formSubjectId || !formGradeId) return []
     
     return knowledgePoints
       .filter(kp => 
-        kp.subject_id === subjectId && 
-        kp.grade_id === gradeId && 
+        kp.subject_id === formSubjectId && 
+        kp.grade_id === formGradeId && 
         kp.id !== currentKnowledgePoint?.id
       )
       .map(kp => ({ value: kp.id, label: kp.name }))
@@ -411,7 +417,9 @@ function KnowledgePoints() {
           >
             <Select 
               placeholder="请选择所属学科"
-              onChange={() => {
+              onChange={(value) => {
+                setFormSubjectId(value)
+                setFormGradeId(null)
                 form.setFieldValue('parent_id', undefined)
                 form.setFieldValue('grade_id', undefined)
               }}
@@ -431,7 +439,10 @@ function KnowledgePoints() {
           >
             <Select 
               placeholder="请选择所属年级"
-              onChange={() => form.setFieldValue('parent_id', undefined)}
+              onChange={(value) => {
+                setFormGradeId(value)
+                form.setFieldValue('parent_id', undefined)
+              }}
             >
               {grades.map(grade => (
                 <Option key={grade.id} value={grade.id}>

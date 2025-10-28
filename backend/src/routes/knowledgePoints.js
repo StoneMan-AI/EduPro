@@ -15,7 +15,12 @@ router.get('/', async (req, res, next) => {
       where,
       include: [
         { model: Subject, as: 'subject' },
-        { model: Grade, as: 'grade' }
+        { model: Grade, as: 'grade' },
+        { 
+          model: KnowledgePoint, 
+          as: 'parent',
+          attributes: ['id', 'name']
+        }
       ],
       order: [['created_at', 'DESC']]
     });
@@ -24,7 +29,8 @@ router.get('/', async (req, res, next) => {
     const formattedData = knowledgePoints.map(kp => ({
       ...kp.toJSON(),
       subject_name: kp.subject?.name,
-      grade_name: kp.grade?.name
+      grade_name: kp.grade?.name,
+      parent_name: kp.parent?.name
     }));
 
     res.json({

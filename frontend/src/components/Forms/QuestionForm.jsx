@@ -54,6 +54,8 @@ function QuestionForm({
   const [answerImageUrl, setAnswerImageUrl] = useState('')
   const [uploadingQuestion, setUploadingQuestion] = useState(false)
   const [uploadingAnswer, setUploadingAnswer] = useState(false)
+  const [selectedSubjectId, setSelectedSubjectId] = useState(null)
+  const [selectedGradeId, setSelectedGradeId] = useState(null)
 
   const isEdit = !!question
 
@@ -79,8 +81,8 @@ function QuestionForm({
 
   // 过滤知识点 - 根据学科和年级双重筛选
   const filteredKnowledgePoints = knowledgePoints.filter(
-    kp => kp.subject_id === form.getFieldValue('subject_id') && 
-          kp.grade_id === form.getFieldValue('grade_id')
+    kp => kp.subject_id === selectedSubjectId && 
+          kp.grade_id === selectedGradeId
   )
 
   // 初始化表单
@@ -97,11 +99,15 @@ function QuestionForm({
           difficulty_id: question.difficulty_id,
           remarks: question.remarks
         })
+        setSelectedSubjectId(question.subject_id)
+        setSelectedGradeId(question.grade_id)
         setQuestionImageUrl(question.question_image_url || '')
         setAnswerImageUrl(question.answer_image_url || '')
       } else {
         // 新增模式
         form.resetFields()
+        setSelectedSubjectId(null)
+        setSelectedGradeId(null)
         setQuestionImageUrl('')
         setAnswerImageUrl('')
       }
@@ -172,12 +178,14 @@ function QuestionForm({
   }
 
   // 学科改变时重置知识点
-  const handleSubjectChange = () => {
+  const handleSubjectChange = (value) => {
+    setSelectedSubjectId(value)
     form.setFieldValue('knowledge_point_id', undefined)
   }
 
   // 年级改变时重置知识点
-  const handleGradeChange = () => {
+  const handleGradeChange = (value) => {
+    setSelectedGradeId(value)
     form.setFieldValue('knowledge_point_id', undefined)
   }
 
