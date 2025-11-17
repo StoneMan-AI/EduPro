@@ -3,7 +3,7 @@ module.exports = {
     name: 'edupro-backend',
     script: './backend/src/server.js',
     cwd: '/var/www/EduPro',
-    instances: 'max',
+    instances: 1,
     exec_mode: 'cluster',
     
     // 环境配置
