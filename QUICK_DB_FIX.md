@@ -43,7 +43,7 @@ HOST=0.0.0.0
 # 数据库配置
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=edupro_prod
+DB_NAME=edupro_db
 DB_USER=edupro_user
 DB_PASSWORD=你的数据库密码
 DB_DIALECT=postgres
@@ -84,10 +84,10 @@ sudo -u postgres psql
 
 ```sql
 -- 检查数据库是否存在
-SELECT datname FROM pg_database WHERE datname = 'edupro_prod';
+SELECT datname FROM pg_database WHERE datname = 'edupro_db';
 
 -- 如果不存在，创建数据库
-CREATE DATABASE edupro_prod;
+CREATE DATABASE edupro_db;
 
 -- 检查用户是否存在
 SELECT usename FROM pg_user WHERE usename = 'edupro_user';
@@ -96,10 +96,10 @@ SELECT usename FROM pg_user WHERE usename = 'edupro_user';
 CREATE USER edupro_user WITH ENCRYPTED PASSWORD '你的强密码';
 
 -- 授予权限
-GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;
+GRANT ALL PRIVILEGES ON DATABASE edupro_db TO edupro_user;
 
 -- 连接到数据库并授予 schema 权限
-\c edupro_prod
+\c edupro_db
 GRANT ALL ON SCHEMA public TO edupro_user;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO edupro_user;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO edupro_user;
@@ -135,10 +135,10 @@ DB_PASSWORD=你的新密码
 
 ```bash
 # 测试连接（使用 edupro_user）
-psql -h localhost -U edupro_user -d edupro_prod
+psql -h localhost -U edupro_user -d edupro_db
 
 # 或者测试 postgres 用户
-psql -h localhost -U postgres -d edupro_prod
+psql -h localhost -U postgres -d edupro_db
 
 # 如果提示输入密码，输入 .env 文件中配置的密码
 # 如果连接成功，说明配置正确
@@ -205,7 +205,7 @@ openssl rand -base64 32
 **A:** 创建数据库：
 
 ```sql
-CREATE DATABASE edupro_prod;
+CREATE DATABASE edupro_db;
 ```
 
 ### Q4: 用户不存在怎么办？
@@ -214,7 +214,7 @@ CREATE DATABASE edupro_prod;
 
 ```sql
 CREATE USER edupro_user WITH ENCRYPTED PASSWORD '密码';
-GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;
+GRANT ALL PRIVILEGES ON DATABASE edupro_db TO edupro_user;
 ```
 
 ### Q5: 权限不足怎么办？
@@ -222,7 +222,7 @@ GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;
 **A:** 授予完整权限：
 
 ```sql
-\c edupro_prod
+\c edupro_db
 GRANT ALL ON SCHEMA public TO edupro_user;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO edupro_user;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO edupro_user;
@@ -257,7 +257,7 @@ PORT=5001
 HOST=0.0.0.0
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=edupro_prod
+DB_NAME=edupro_db
 DB_USER=edupro_user
 DB_PASSWORD=请替换为实际密码
 DB_DIALECT=postgres

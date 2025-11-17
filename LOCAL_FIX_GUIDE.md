@@ -85,7 +85,7 @@ ls -la /opt/EduPro/frontend/dist/
 
 ### 2. 测试网站
 1. 清除浏览器缓存（Ctrl+Shift+R）
-2. 访问 https://edupro.adddesigngroup.com
+2. 访问 https://edupro.qingsongkao.cn
 3. 检查控制台是否还有错误
 
 ## 📊 预期结果

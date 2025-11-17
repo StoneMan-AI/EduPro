@@ -1,7 +1,7 @@
 # 图片访问404问题诊断指南
 
 ## 问题描述
-图片已成功上传到服务器，数据已插入数据库，但通过 `https://edupro.adddesigngroup.com/uploads/filename.jpg` 访问返回404。
+图片已成功上传到服务器，数据已插入数据库，但通过 `https://edupro.qingsongkao.cn/uploads/filename.jpg` 访问返回404。
 
 ## 诊断步骤
 
@@ -41,7 +41,7 @@ curl -I http://localhost:5001/uploads/filename.jpg
 curl -I http://localhost/uploads/filename.jpg
 
 # 测试域名访问
-curl -I https://edupro.adddesigngroup.com/uploads/filename.jpg
+curl -I https://edupro.qingsongkao.cn/uploads/filename.jpg
 ```
 
 ### 4. 检查文件权限
@@ -109,7 +109,7 @@ location /uploads/ {
 
 ## 验证修复
 修复后，访问以下URL应该能正常显示图片：
-- https://edupro.adddesigngroup.com/uploads/filename.jpg
+- https://edupro.qingsongkao.cn/uploads/filename.jpg
 
 ## 调试技巧
 1. 查看浏览器开发者工具的Network标签

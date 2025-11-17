@@ -48,7 +48,7 @@ curl http://localhost:5001/health
 
 ```bash
 # 测试数据库连接
-psql -h localhost -U edupro_user -d edupro_prod -c "SELECT version();"
+psql -h localhost -U edupro_user -d edupro_db -c "SELECT version();"
 
 # 检查数据库服务状态
 sudo systemctl status postgresql
@@ -111,13 +111,13 @@ sudo systemctl start postgresql
 sudo systemctl enable postgresql
 
 # 检查数据库是否存在
-sudo -u postgres psql -c "\l" | grep edupro_prod
+sudo -u postgres psql -c "\l" | grep edupro_db
 
 # 如果数据库不存在，创建它
 sudo -u postgres psql << 'EOF'
-CREATE DATABASE edupro_prod;
+CREATE DATABASE edupro_db;
 CREATE USER edupro_user WITH ENCRYPTED PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;
+GRANT ALL PRIVILEGES ON DATABASE edupro_db TO edupro_user;
 EOF
 ```
 
@@ -136,12 +136,12 @@ PORT=5001
 HOST=0.0.0.0
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=edupro_prod
+DB_NAME=edupro_db
 DB_USER=edupro_user
 DB_PASSWORD=your_actual_password
 DB_DIALECT=postgres
 JWT_SECRET=your_jwt_secret
-CORS_ORIGIN=https://edupro.adddesigngroup.com
+CORS_ORIGIN=https://edupro.qingsongkao.cn
 UPLOAD_DIR=/opt/EduPro/uploads
 ```
 
@@ -188,7 +188,7 @@ pm2 start ecosystem.config.js --env production
 
 # 4. 验证服务
 curl http://localhost:5001/health
-curl https://edupro.adddesigngroup.com/api/questions?page=1&page_size=20
+curl https://edupro.qingsongkao.cn/api/questions?page=1&page_size=20
 ```
 
 ## 📊 监控和日志
@@ -239,10 +239,10 @@ tail -100 /var/log/edupro/error.log
 
 ```bash
 # 测试数据库连接
-psql -h localhost -U edupro_user -d edupro_prod -c "SELECT 1;"
+psql -h localhost -U edupro_user -d edupro_db -c "SELECT 1;"
 
 # 检查数据库表
-psql -h localhost -U edupro_user -d edupro_prod -c "\dt"
+psql -h localhost -U edupro_user -d edupro_db -c "\dt"
 ```
 
 ## 📞 获取支持信息

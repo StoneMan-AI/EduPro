@@ -37,7 +37,7 @@ cat /var/www/EduPro/backend/.env | grep -E "DB_NAME|DB_USER|DB_PASSWORD|DB_HOST|
 
 **重要**: 确保 `DB_NAME` 与您能连接的数据库名称一致：
 - 如果 `psql` 连接的是 `edupro_db`，则 `.env` 中应该是 `DB_NAME=edupro_db`
-- 如果 `psql` 连接的是 `edupro_prod`，则 `.env` 中应该是 `DB_NAME=edupro_prod`
+- 如果 `psql` 连接的是 `edupro_db`，则 `.env` 中应该是 `DB_NAME=edupro_db`
 
 ### 步骤 3: 验证 .env 文件格式
 

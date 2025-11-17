@@ -31,7 +31,7 @@ cat .env | grep DB_
 ```bash
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=edupro_prod
+DB_NAME=edupro_db
 DB_USER=edupro_user
 DB_PASSWORD=your_password_here
 DB_DIALECT=postgres
@@ -62,7 +62,7 @@ HOST=0.0.0.0
 # 数据库配置
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=edupro_prod
+DB_NAME=edupro_db
 DB_USER=edupro_user
 DB_PASSWORD=你的数据库密码
 DB_DIALECT=postgres
@@ -72,7 +72,7 @@ JWT_SECRET=你的JWT密钥
 BCRYPT_ROUNDS=12
 
 # CORS 配置
-CORS_ORIGIN=https://edupro.adddesigngroup.com
+CORS_ORIGIN=https://edupro.qingsongkao.cn
 
 # 文件上传配置
 UPLOAD_DIR=/opt/EduPro/backend/src/uploads
@@ -124,8 +124,8 @@ sudo -u postgres psql
 -- 列出所有用户
 \du
 
--- 检查 edupro_prod 数据库是否存在
-SELECT datname FROM pg_database WHERE datname = 'edupro_prod';
+-- 检查 edupro_db 数据库是否存在
+SELECT datname FROM pg_database WHERE datname = 'edupro_db';
 
 -- 检查 edupro_user 用户是否存在
 SELECT usename FROM pg_user WHERE usename = 'edupro_user';
@@ -135,16 +135,16 @@ SELECT usename FROM pg_user WHERE usename = 'edupro_user';
 
 ```sql
 -- 创建数据库
-CREATE DATABASE edupro_prod;
+CREATE DATABASE edupro_db;
 
 -- 创建用户并设置密码
 CREATE USER edupro_user WITH ENCRYPTED PASSWORD '你的强密码';
 
 -- 授予权限
-GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;
+GRANT ALL PRIVILEGES ON DATABASE edupro_db TO edupro_user;
 
--- 连接到 edupro_prod 数据库
-\c edupro_prod
+-- 连接到 edupro_db 数据库
+\c edupro_db
 
 -- 授予 schema 权限
 GRANT ALL ON SCHEMA public TO edupro_user;
@@ -182,7 +182,7 @@ DB_PASSWORD=你的新密码
 
 ```bash
 # 测试 edupro_user 用户连接
-psql -h localhost -U edupro_user -d edupro_prod
+psql -h localhost -U edupro_user -d edupro_db
 
 # 如果提示输入密码，输入 .env 文件中配置的密码
 # 如果连接成功，说明数据库配置正确

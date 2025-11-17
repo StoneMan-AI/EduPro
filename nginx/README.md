@@ -25,7 +25,7 @@ sudo nginx -s reload
 sudo apt install -y certbot python3-certbot-nginx
 
 # 获取 SSL 证书（会自动修改配置文件）
-sudo certbot --nginx -d edupro.adddesigngroup.com
+sudo certbot --nginx -d edupro.qingsongkao.cn
 ```
 
 ### 3. 验证 HTTPS 配置
@@ -34,7 +34,7 @@ sudo certbot --nginx -d edupro.adddesigngroup.com
 sudo certbot certificates
 
 # 测试 HTTPS 访问
-curl -I https://edupro.adddesigngroup.com
+curl -I https://edupro.qingsongkao.cn
 ```
 
 ## 故障排除
@@ -42,13 +42,13 @@ curl -I https://edupro.adddesigngroup.com
 ### 问题：SSL 证书文件不存在
 **错误信息：**
 ```
-cannot load certificate "/etc/letsencrypt/live/edupro.adddesigngroup.com/fullchain.pem": BIO_new_file() failed
+cannot load certificate "/etc/letsencrypt/live/edupro.qingsongkao.cn/fullchain.pem": BIO_new_file() failed
 ```
 
 **解决方案：**
 1. 确保先获取 SSL 证书再启用 HTTPS 配置
 2. 或者使用 HTTP 配置进行初始部署
-3. 使用 `sudo certbot --nginx -d edupro.adddesigngroup.com` 获取证书
+3. 使用 `sudo certbot --nginx -d edupro.qingsongkao.cn` 获取证书
 
 ### 问题：Nginx 配置测试失败
 **检查步骤：**
@@ -60,7 +60,7 @@ sudo nginx -t
 sudo nginx -T
 
 # 检查证书文件是否存在
-ls -la /etc/letsencrypt/live/edupro.adddesigngroup.com/
+ls -la /etc/letsencrypt/live/edupro.qingsongkao.cn/
 ```
 
 ### 问题：端口冲突

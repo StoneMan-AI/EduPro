@@ -46,13 +46,13 @@ curl http://localhost:5001/api/questions
 
 ```bash
 # 测试通过 Nginx 访问
-curl http://edupro.adddesigngroup.com/
+curl http://edupro.qingsongkao.cn/
 
 # 测试 API 代理
-curl http://edupro.adddesigngroup.com/api/
+curl http://edupro.qingsongkao.cn/api/
 
 # 测试健康检查
-curl http://edupro.adddesigngroup.com/health
+curl http://edupro.qingsongkao.cn/health
 ```
 
 ### 3. 检查服务状态
@@ -155,7 +155,7 @@ sudo tail -f /var/log/nginx/edupro.error.log
 telnet localhost 5001
 
 # 测试外部连接
-telnet edupro.adddesigngroup.com 80
+telnet edupro.qingsongkao.cn 80
 ```
 
 ### 检查文件权限
@@ -185,7 +185,7 @@ pm2 start ecosystem.config.js --env production
 
 # 4. 验证服务
 curl http://localhost:5001/
-curl http://edupro.adddesigngroup.com/
+curl http://edupro.qingsongkao.cn/
 ```
 
 ## 联系支持

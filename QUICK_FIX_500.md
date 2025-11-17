@@ -33,7 +33,7 @@ curl http://localhost:5001/api/questions?page=1&page_size=20
 sudo systemctl status postgresql
 
 # 测试数据库连接
-psql -h localhost -U edupro_user -d edupro_prod -c "SELECT 1;"
+psql -h localhost -U edupro_user -d edupro_db -c "SELECT 1;"
 ```
 
 ### 5. 重启服务

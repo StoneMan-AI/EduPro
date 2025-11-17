@@ -1,12 +1,12 @@
 # 🌐 EduPro 二级域名部署指南
 
-本文档专门针对 `edupro.adddesigngroup.com` 二级域名的部署配置，适用于已有项目的服务器环境。
+本文档专门针对 `edupro.qingsongkao.cn` 二级域名的部署配置，适用于已有项目的服务器环境。
 
 ## 📋 部署概览
 
 ### 项目配置
 - **主域名项目**: `adddesigngroup.com` (已存在)
-- **EduPro 二级域名**: `edupro.adddesigngroup.com`
+- **EduPro 二级域名**: `edupro.qingsongkao.cn`
 - **后端端口**: `5001` (避免与主项目冲突)
 - **前端**: 通过 Nginx 代理服务静态文件
 
@@ -14,7 +14,7 @@
 ```
 Internet → Nginx → 
 ├── adddesigngroup.com (主项目, 端口 5000)
-└── edupro.adddesigngroup.com (EduPro, 端口 5001)
+└── edupro.qingsongkao.cn (EduPro, 端口 5001)
 ```
 
 ## 🚀 快速部署
@@ -42,13 +42,13 @@ npm run build
 ```bash
 # 创建数据库和用户
 sudo -u postgres psql
-CREATE DATABASE edupro_prod;
+CREATE DATABASE edupro_db;
 CREATE USER edupro_user WITH ENCRYPTED PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;
+GRANT ALL PRIVILEGES ON DATABASE edupro_db TO edupro_user;
 \q
 
 # 导入数据库结构
-psql -h localhost -U edupro_user -d edupro_prod -f database/schema.sql
+psql -h localhost -U edupro_user -d edupro_db -f database/schema.sql
 ```
 
 ### 4. 配置环境变量
@@ -65,12 +65,12 @@ PORT=5001
 HOST=0.0.0.0
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=edupro_prod
+DB_NAME=edupro_db
 DB_USER=edupro_user
 DB_PASSWORD=your_password
 DB_DIALECT=postgres
 JWT_SECRET=your_jwt_secret
-CORS_ORIGIN=https://edupro.adddesigngroup.com
+CORS_ORIGIN=https://edupro.qingsongkao.cn
 UPLOAD_DIR=/opt/EduPro/uploads
 ```
 
@@ -91,7 +91,7 @@ sudo nginx -s reload
 sudo apt install -y certbot python3-certbot-nginx
 
 # 获取 SSL 证书（会自动修改配置文件添加 HTTPS 支持）
-sudo certbot --nginx -d edupro.adddesigngroup.com
+sudo certbot --nginx -d edupro.qingsongkao.cn
 ```
 
 **故障排除：** 如果遇到 SSL 证书文件不存在的错误，请确保域名解析正确，然后重新运行 certbot 命令。
@@ -151,7 +151,7 @@ cat nginx/multi-project.conf.example
 
 ```bash
 # 为二级域名获取独立的 SSL 证书
-sudo certbot --nginx -d edupro.adddesigngroup.com
+sudo certbot --nginx -d edupro.qingsongkao.cn
 ```
 
 ### 4. 数据库配置
@@ -159,9 +159,9 @@ sudo certbot --nginx -d edupro.adddesigngroup.com
 ```bash
 # 创建独立数据库 (避免与主项目冲突)
 sudo -u postgres psql << 'EOF'
-CREATE DATABASE edupro_prod;
+CREATE DATABASE edupro_db;
 CREATE USER edupro_user WITH ENCRYPTED PASSWORD 'strong_password';
-GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;
+GRANT ALL PRIVILEGES ON DATABASE edupro_db TO edupro_user;
 EOF
 ```
 
@@ -209,10 +209,10 @@ netstat -tlnp | grep -E ':(5000|5001)'
 ### 2. 健康检查
 ```bash
 # EduPro 健康检查
-curl -f https://edupro.adddesigngroup.com/health
+curl -f https://edupro.qingsongkao.cn/health
 
 # API 测试
-curl https://edupro.adddesigngroup.com/api/health
+curl https://edupro.qingsongkao.cn/api/health
 ```
 
 ### 3. 日志监控
@@ -258,7 +258,7 @@ sudo tail -f /var/log/nginx/error.log
 ### 4. 数据库连接问题
 ```bash
 # 测试数据库连接
-psql -h localhost -U edupro_user -d edupro_prod -c "SELECT version();"
+psql -h localhost -U edupro_user -d edupro_db -c "SELECT version();"
 
 # 检查 PostgreSQL 服务
 sudo systemctl status postgresql
@@ -294,9 +294,9 @@ cp backend/.env /tmp/edupro-env-backup
 
 部署完成后，请检查以下项目：
 
-- [ ] https://edupro.adddesigngroup.com 可正常访问
+- [ ] https://edupro.qingsongkao.cn 可正常访问
 - [ ] SSL 证书有效 (绿锁图标)
-- [ ] API 接口正常: https://edupro.adddesigngroup.com/api/health
+- [ ] API 接口正常: https://edupro.qingsongkao.cn/api/health
 - [ ] 文件上传功能正常
 - [ ] 数据库连接正常
 - [ ] PM2 进程运行正常
@@ -309,7 +309,7 @@ cp backend/.env /tmp/edupro-env-backup
 1. 错误日志: `/var/log/nginx/edupro.error.log`
 2. 应用日志: `pm2 logs edupro-backend`
 3. 系统信息: `uname -a` 和 `nginx -v`
-4. 网络测试: `curl -I https://edupro.adddesigngroup.com`
+4. 网络测试: `curl -I https://edupro.qingsongkao.cn`
 
 ---
 

@@ -33,13 +33,13 @@ npm run build
 ```bash
 # 创建数据库和用户
 sudo -u postgres psql
-CREATE DATABASE edupro_prod;
+CREATE DATABASE edupro_db;
 CREATE USER edupro_user WITH ENCRYPTED PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;
+GRANT ALL PRIVILEGES ON DATABASE edupro_db TO edupro_user;
 \q
 
 # 导入数据库结构
-psql -h localhost -U edupro_user -d edupro_prod -f database/schema.sql
+psql -h localhost -U edupro_user -d edupro_db -f database/schema.sql
 ```
 
 ### 4. 配置环境变量
@@ -58,7 +58,7 @@ HOST=0.0.0.0
 # 数据库配置
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=edupro_prod
+DB_NAME=edupro_db
 DB_USER=edupro_user
 DB_PASSWORD=请设置强密码
 DB_DIALECT=postgres
@@ -90,7 +90,7 @@ nano .env
 **必须修改的配置项:**
 ```bash
 DB_PASSWORD=设置强数据库密码                    # 更改为实际的数据库密码
-CORS_ORIGIN=https://edupro.adddesigngroup.com  # 二级域名
+CORS_ORIGIN=https://edupro.qingsongkao.cn  # 二级域名
 ```
 
 ### 4. 部署应用
@@ -139,7 +139,7 @@ docker-compose -f docker/docker-compose.prod.yml logs -f app
 sudo cp nginx/edupro.conf /etc/nginx/sites-available/edupro
 sudo ln -s /etc/nginx/sites-available/edupro /etc/nginx/sites-enabled/edupro
 
-# 测试配置 (域名已预配置为 edupro.adddesigngroup.com)
+# 测试配置 (域名已预配置为 edupro.qingsongkao.cn)
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -147,7 +147,7 @@ sudo systemctl reload nginx
 ### 2. 获取二级域名 SSL 证书
 ```bash
 # 使用 Let's Encrypt 为二级域名获取证书
-sudo certbot --nginx -d edupro.adddesigngroup.com
+sudo certbot --nginx -d edupro.qingsongkao.cn
 ```
 
 ### 3. 多项目配置参考
@@ -175,13 +175,13 @@ netstat -tlnp | grep -E ':(80|443|5001|5432)'
 curl -f http://localhost:5001/health
 
 # 前端访问测试
-curl -I https://edupro.adddesigngroup.com
+curl -I https://edupro.qingsongkao.cn
 ```
 
 ### 3. 数据库连接测试
 ```bash
 # 测试数据库连接
-psql -h localhost -U edupro_user -d edupro_prod -c "SELECT version();"
+psql -h localhost -U edupro_user -d edupro_db -c "SELECT version();"
 ```
 
 ## 🚨 常见问题排查

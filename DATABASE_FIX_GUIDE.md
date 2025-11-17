@@ -15,14 +15,14 @@ API 返回 500 错误，错误信息显示：
 ```bash
 # 在服务器上执行
 cd /opt/EduPro
-psql -h localhost -U edupro_user -d edupro_prod -f database/fix_missing_columns.sql
+psql -h localhost -U edupro_user -d edupro_db -f database/fix_missing_columns.sql
 ```
 
 ### 方法 2：手动修复
 
 ```bash
 # 连接到数据库
-psql -h localhost -U edupro_user -d edupro_prod
+psql -h localhost -U edupro_user -d edupro_db
 
 # 在 psql 中执行以下命令
 ```
@@ -42,10 +42,10 @@ UPDATE difficulty_levels SET updated_at = created_at WHERE updated_at IS NULL;
 
 ```bash
 # 备份现有数据（可选）
-pg_dump -h localhost -U edupro_user -d edupro_prod > backup_$(date +%Y%m%d_%H%M%S).sql
+pg_dump -h localhost -U edupro_user -d edupro_db > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # 重新导入修复后的结构
-psql -h localhost -U edupro_user -d edupro_prod -f database/schema.sql
+psql -h localhost -U edupro_user -d edupro_db -f database/schema.sql
 ```
 
 ## 🔍 验证修复
@@ -69,10 +69,10 @@ ORDER BY table_name;
 ### 2. 测试 API
 ```bash
 # 测试题目列表 API
-curl "https://edupro.adddesigngroup.com/api/questions?page=1&page_size=20"
+curl "https://edupro.qingsongkao.cn/api/questions?page=1&page_size=20"
 
 # 测试难度级别 API
-curl "https://edupro.adddesigngroup.com/api/config/difficulty-levels"
+curl "https://edupro.qingsongkao.cn/api/config/difficulty-levels"
 ```
 
 ### 3. 重启后端服务
@@ -127,12 +127,12 @@ grep -r "updatedAt" /opt/EduPro/backend/src/models/
 3. **完全重建数据库**
 ```bash
 # 删除并重建数据库
-sudo -u postgres psql -c "DROP DATABASE IF EXISTS edupro_prod;"
-sudo -u postgres psql -c "CREATE DATABASE edupro_prod;"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;"
+sudo -u postgres psql -c "DROP DATABASE IF EXISTS edupro_db;"
+sudo -u postgres psql -c "CREATE DATABASE edupro_db;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE edupro_db TO edupro_user;"
 
 # 重新导入结构
-psql -h localhost -U edupro_user -d edupro_prod -f database/schema.sql
+psql -h localhost -U edupro_user -d edupro_db -f database/schema.sql
 ```
 
 ## 📝 预防措施

@@ -21,13 +21,17 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // 信任代理设置 (用于Nginx反向代理)
-app.set('trust proxy', true);
+// 只信任第一个代理（Nginx），而不是所有代理，提高安全性
+app.set('trust proxy', 1);
 
 // 速率限制
 const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW) || 15 * 60 * 1000, // 15分钟
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW) || 1 * 60 * 1000, // 15分钟
   max: parseInt(process.env.RATE_LIMIT_MAX) || 100, // 限制每个IP 100次请求
-  message: '请求过于频繁，请稍后再试'
+  message: '请求过于频繁，请稍后再试',
+  // 使用标准化的速率限制头部
+  standardHeaders: true,
+  legacyHeaders: false
 });
 
 // 中间件

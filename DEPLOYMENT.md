@@ -1,6 +1,6 @@
 # 🛠️ EduPro 生产环境部署指南
 
-本文档提供 EduPro 试题管理系统的完整生产环境部署步骤，适用于 `edupro.adddesigngroup.com` 二级域名部署。
+本文档提供 EduPro 试题管理系统的完整生产环境部署步骤，适用于 `edupro.qingsongkao.cn` 二级域名部署。
 
 ## 📋 系统要求
 
@@ -40,13 +40,13 @@ npm run build
 ```bash
 # 创建数据库和用户
 sudo -u postgres psql
-CREATE DATABASE edupro_prod;
+CREATE DATABASE edupro_db;
 CREATE USER edupro_user WITH ENCRYPTED PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;
+GRANT ALL PRIVILEGES ON DATABASE edupro_db TO edupro_user;
 \q
 
 # 导入数据库结构
-psql -h localhost -U edupro_user -d edupro_prod -f database/schema.sql
+psql -h localhost -U edupro_user -d edupro_db -f database/schema.sql
 ```
 
 ### 4. 配置环境变量
@@ -235,15 +235,15 @@ sudo systemctl enable postgresql
 
 # 创建数据库和用户
 sudo -u postgres psql << EOF
-CREATE DATABASE edupro_prod;
+CREATE DATABASE edupro_db;
 CREATE USER edupro_user WITH ENCRYPTED PASSWORD 'your_strong_password';
-GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;
+GRANT ALL PRIVILEGES ON DATABASE edupro_db TO edupro_user;
 ALTER USER edupro_user CREATEDB;
 \q
 EOF
 
 # 导入数据库结构
-psql -h localhost -U edupro_user -d edupro_prod -f database/schema.sql
+psql -h localhost -U edupro_user -d edupro_db -f database/schema.sql
 ```
 
 #### 2.2 数据库性能优化
@@ -297,7 +297,7 @@ HOST=0.0.0.0
 # 数据库配置
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=edupro_prod
+DB_NAME=edupro_db
 DB_USER=edupro_user
 DB_PASSWORD=your_strong_password
 DB_DIALECT=postgres
@@ -582,7 +582,7 @@ cat > /var/www/edupro/scripts/backup.sh << 'EOF'
 
 BACKUP_DIR="/var/backups/edupro"
 DATE=$(date +%Y%m%d_%H%M%S)
-DB_NAME="edupro_prod"
+DB_NAME="edupro_db"
 DB_USER="edupro_user"
 
 # 创建备份目录
@@ -690,7 +690,7 @@ services:
     environment:
       NODE_ENV: production
       DB_HOST: db
-      DB_NAME: edupro_prod
+      DB_NAME: edupro_db
       DB_USER: edupro_user
       DB_PASSWORD: ${DB_PASSWORD}
     volumes:
@@ -705,7 +705,7 @@ services:
   db:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: edupro_prod
+      POSTGRES_DB: edupro_db
       POSTGRES_USER: edupro_user
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:

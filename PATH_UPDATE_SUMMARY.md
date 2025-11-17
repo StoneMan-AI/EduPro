@@ -90,7 +90,7 @@ curl http://localhost:5001/health
 ls -la /opt/EduPro/frontend/dist/
 
 # 测试通过 Nginx 访问
-curl -I https://edupro.adddesigngroup.com/
+curl -I https://edupro.qingsongkao.cn/
 ```
 
 ## 📝 注意事项

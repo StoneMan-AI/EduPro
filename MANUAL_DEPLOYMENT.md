@@ -1,6 +1,6 @@
 # 🛠️ EduPro 手动部署指南
 
-本文档提供 EduPro 试题管理系统的完整手动部署步骤，适用于 `edupro.adddesigngroup.com` 二级域名部署。
+本文档提供 EduPro 试题管理系统的完整手动部署步骤，适用于 `edupro.qingsongkao.cn` 二级域名部署。
 
 ## 📋 部署概览
 
@@ -8,7 +8,7 @@
 ```
 Internet → Nginx → 
 ├── adddesigngroup.com (主项目, 端口 5000)
-└── edupro.adddesigngroup.com (EduPro, 端口 5001)
+└── edupro.qingsongkao.cn (EduPro, 端口 5001)
 ```
 
 ### 技术栈
@@ -111,9 +111,9 @@ nginx -v
 sudo -u postgres psql
 
 # 在 PostgreSQL 中执行以下命令
-CREATE DATABASE edupro_prod;
+CREATE DATABASE edupro_db;
 CREATE USER edupro_user WITH ENCRYPTED PASSWORD 'your_strong_password_here';
-GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;
+GRANT ALL PRIVILEGES ON DATABASE edupro_db TO edupro_user;
 ALTER USER edupro_user CREATEDB;
 \q
 ```
@@ -143,7 +143,7 @@ sudo systemctl restart postgresql
 cd /var/www/edupro
 
 # 导入数据库结构
-psql -h localhost -U edupro_user -d edupro_prod -f database/schema.sql
+psql -h localhost -U edupro_user -d edupro_db -f database/schema.sql
 ```
 
 ## 📁 项目部署
@@ -219,7 +219,7 @@ HOST=0.0.0.0
 # 数据库配置
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=edupro_prod
+DB_NAME=edupro_db
 DB_USER=edupro_user
 DB_PASSWORD=your_strong_password_here
 DB_DIALECT=postgres
@@ -229,7 +229,7 @@ JWT_SECRET=your_jwt_secret_here
 BCRYPT_ROUNDS=12
 
 # CORS 配置
-CORS_ORIGIN=https://edupro.adddesigngroup.com
+CORS_ORIGIN=https://edupro.qingsongkao.cn
 
 # 文件上传配置
 UPLOAD_DIR=/opt/EduPro/uploads
@@ -267,13 +267,13 @@ sudo nano /etc/nginx/sites-available/edupro
 **添加以下内容:**
 ```nginx
 # EduPro 试题管理系统 Nginx 配置
-# 二级域名配置 - edupro.adddesigngroup.com
+# 二级域名配置 - edupro.qingsongkao.cn
 
 # HTTP 重定向到 HTTPS
 server {
     listen 80;
     listen [::]:80;
-    server_name edupro.adddesigngroup.com;
+    server_name edupro.qingsongkao.cn;
     
     # Let's Encrypt ACME 验证
     location /.well-known/acme-challenge/ {
@@ -290,12 +290,12 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name edupro.adddesigngroup.com;
+    server_name edupro.qingsongkao.cn;
     
     # SSL 证书配置
-    ssl_certificate /etc/letsencrypt/live/edupro.adddesigngroup.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/edupro.adddesigngroup.com/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/edupro.adddesigngroup.com/chain.pem;
+    ssl_certificate /etc/letsencrypt/live/edupro.qingsongkao.cn/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/edupro.qingsongkao.cn/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/edupro.qingsongkao.cn/chain.pem;
     
     # SSL 安全配置
     ssl_protocols TLSv1.2 TLSv1.3;
@@ -408,7 +408,7 @@ sudo apt install -y certbot python3-certbot-nginx
 ### 2. 获取 SSL 证书
 ```bash
 # 为二级域名获取 SSL 证书
-sudo certbot --nginx -d edupro.adddesigngroup.com
+sudo certbot --nginx -d edupro.qingsongkao.cn
 
 # 测试自动续期
 sudo certbot renew --dry-run
@@ -501,10 +501,10 @@ netstat -tlnp | grep -E ':(80|443|5001)'
 curl -f http://localhost:5001/health
 
 # 测试前端访问
-curl -I https://edupro.adddesigngroup.com
+curl -I https://edupro.qingsongkao.cn
 
 # 测试 API 接口
-curl https://edupro.adddesigngroup.com/api/health
+curl https://edupro.qingsongkao.cn/api/health
 ```
 
 ### 3. 检查日志
@@ -543,7 +543,7 @@ pm2 restart edupro-backend
 mkdir -p /var/backups/edupro
 
 # 备份数据库
-pg_dump -h localhost -U edupro_user -d edupro_prod > /var/backups/edupro/edupro_$(date +%Y%m%d_%H%M%S).sql
+pg_dump -h localhost -U edupro_user -d edupro_db > /var/backups/edupro/edupro_$(date +%Y%m%d_%H%M%S).sql
 
 # 备份上传文件
 tar -czf /var/backups/edupro/uploads_$(date +%Y%m%d_%H%M%S).tar.gz /var/www/edupro/uploads/
@@ -595,7 +595,7 @@ sudo tail -f /var/log/nginx/error.log
 **数据库连接失败:**
 ```bash
 # 测试数据库连接
-psql -h localhost -U edupro_user -d edupro_prod -c "SELECT version();"
+psql -h localhost -U edupro_user -d edupro_db -c "SELECT version();"
 
 # 检查 PostgreSQL 服务
 sudo systemctl status postgresql

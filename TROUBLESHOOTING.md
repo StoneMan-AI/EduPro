@@ -7,7 +7,7 @@
 #### 问题：SSL 证书文件不存在
 **错误信息：**
 ```
-cannot load certificate "/etc/letsencrypt/live/edupro.adddesigngroup.com/fullchain.pem": BIO_new_file() failed
+cannot load certificate "/etc/letsencrypt/live/edupro.qingsongkao.cn/fullchain.pem": BIO_new_file() failed
 ```
 
 **原因：** Nginx 配置中引用了不存在的 SSL 证书文件
@@ -21,14 +21,14 @@ sudo nginx -t
 sudo nginx -s reload
 
 # 然后获取 SSL 证书
-sudo certbot --nginx -d edupro.adddesigngroup.com
+sudo certbot --nginx -d edupro.qingsongkao.cn
 ```
 
 **方案2：检查域名解析**
 ```bash
 # 确保域名正确解析到服务器 IP
-nslookup edupro.adddesigngroup.com
-dig edupro.adddesigngroup.com
+nslookup edupro.qingsongkao.cn
+dig edupro.qingsongkao.cn
 
 # 检查防火墙是否允许 80 和 443 端口
 sudo ufw status
@@ -47,7 +47,7 @@ The nginx plugin is not working; there may be problems with your existing config
 sudo nginx -t
 
 # 2. 确保域名解析正确
-ping edupro.adddesigngroup.com
+ping edupro.qingsongkao.cn
 
 # 3. 检查端口是否被占用
 sudo netstat -tlnp | grep -E ':(80|443)'
@@ -56,7 +56,7 @@ sudo netstat -tlnp | grep -E ':(80|443)'
 sudo systemctl stop apache2  # 如果安装了 Apache
 
 # 5. 重新尝试获取证书
-sudo certbot --nginx -d edupro.adddesigngroup.com
+sudo certbot --nginx -d edupro.qingsongkao.cn
 ```
 
 ### 2. Nginx 配置错误
@@ -111,7 +111,7 @@ sudo -u postgres psql -c "\l"
 sudo -u postgres psql -c "\du"
 
 # 5. 测试连接
-psql -h localhost -U edupro_user -d edupro_prod -c "SELECT version();"
+psql -h localhost -U edupro_user -d edupro_db -c "SELECT version();"
 ```
 
 #### 问题：数据库用户权限不足
@@ -120,7 +120,7 @@ psql -h localhost -U edupro_user -d edupro_prod -c "SELECT version();"
 sudo -u postgres psql << 'EOF'
 DROP USER IF EXISTS edupro_user;
 CREATE USER edupro_user WITH ENCRYPTED PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE edupro_prod TO edupro_user;
+GRANT ALL PRIVILEGES ON DATABASE edupro_db TO edupro_user;
 ALTER USER edupro_user CREATEDB;
 \q
 EOF
@@ -296,7 +296,7 @@ free -h
 sudo nginx -t
 
 # 验证数据库连接
-psql -h localhost -U edupro_user -d edupro_prod -c "SELECT 1;"
+psql -h localhost -U edupro_user -d edupro_db -c "SELECT 1;"
 
 # 验证环境变量
 pm2 show edupro-backend
@@ -314,7 +314,7 @@ sudo cp /etc/nginx/sites-available/edupro.backup /etc/nginx/sites-available/edup
 sudo nginx -s reload
 
 # 恢复数据库（如果有备份）
-pg_restore -h localhost -U edupro_user -d edupro_prod /var/backups/edupro/backup.sql
+pg_restore -h localhost -U edupro_user -d edupro_db /var/backups/edupro/backup.sql
 ```
 
 ### 2. 完全重置
