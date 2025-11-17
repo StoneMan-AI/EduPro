@@ -44,7 +44,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // 静态文件服务 (图片上传目录)
-app.use('/uploads', express.static(path.join(__dirname, 'src/uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 健康检查
 app.get('/health', (req, res) => {
@@ -97,8 +97,9 @@ async function startServer() {
     }
 
     // 启动服务器
-    app.listen(PORT, () => {
-      console.log(`🚀 服务器运行在 http://localhost:${PORT}`);
+    const HOST = process.env.HOST || '0.0.0.0';
+    app.listen(PORT, HOST, () => {
+      console.log(`🚀 服务器运行在 http://${HOST}:${PORT}`);
       console.log(`📊 环境: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🗄️  数据库: ${process.env.DB_NAME || 'edupro_db'}`);
     });

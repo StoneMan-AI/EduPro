@@ -71,7 +71,7 @@ BCRYPT_ROUNDS=12
 CORS_ORIGIN=https://yourdomain.com
 
 # 文件上传配置
-UPLOAD_DIR=/opt/EduPro/uploads
+UPLOAD_DIR=/var/www/EduPro/uploads
 MAX_FILE_SIZE=10485760
 ALLOWED_FILE_TYPES=jpg,jpeg,png,gif
 

@@ -2,7 +2,7 @@ module.exports = {
   apps: [{
     name: 'edupro-backend',
     script: './backend/src/server.js',
-    cwd: '/opt/EduPro',
+    cwd: '/var/www/EduPro',
     instances: 'max',
     exec_mode: 'cluster',
     
