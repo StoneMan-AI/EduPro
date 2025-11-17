@@ -5,7 +5,12 @@ const morgan = require('morgan');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
-require('dotenv').config();
+const fs = require('fs');
+
+// 加载环境变量 - 支持从项目根目录或 backend 目录查找 .env 文件
+const envPath = path.resolve(__dirname, '../../.env');
+const backendEnvPath = path.resolve(__dirname, '../.env');
+require('dotenv').config({ path: fs.existsSync(backendEnvPath) ? backendEnvPath : envPath });
 
 const { sequelize } = require('./models');
 const routes = require('./routes');

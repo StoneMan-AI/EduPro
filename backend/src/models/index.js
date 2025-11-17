@@ -1,5 +1,23 @@
 const { Sequelize } = require('sequelize');
-require('dotenv').config();
+const path = require('path');
+const fs = require('fs');
+
+// 加载环境变量 - 支持从项目根目录或 backend 目录查找 .env 文件
+const envPath = path.resolve(__dirname, '../../../.env');
+const backendEnvPath = path.resolve(__dirname, '../../.env');
+const envFile = fs.existsSync(backendEnvPath) ? backendEnvPath : envPath;
+require('dotenv').config({ path: envFile });
+
+// 调试：输出环境变量加载信息
+console.log('📁 环境变量文件路径:', envFile);
+console.log('📁 文件是否存在:', fs.existsSync(envFile));
+console.log('🔐 数据库配置:', {
+  DB_HOST: process.env.DB_HOST || 'localhost',
+  DB_PORT: process.env.DB_PORT || 5432,
+  DB_NAME: process.env.DB_NAME || 'edupro_db',
+  DB_USER: process.env.DB_USER || 'postgres',
+  DB_PASSWORD: process.env.DB_PASSWORD ? '***已设置***' : '未设置'
+});
 
 // 数据库配置
 const sequelize = new Sequelize(
