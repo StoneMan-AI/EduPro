@@ -259,20 +259,40 @@ function QuestionForm({
           return
         }
       } else if (isEdit) {
-        // 编辑模式：检查图片是否被删除
+        // 编辑模式：检查图片是否被删除或修改
         if (answerImagePreview && answerImagePreview.length > 0) {
-          // 保持原有图片URL（未修改）
-          answerImageUrl = answerImagePreview
-          console.log('答案图片未修改，保持原有URL:', answerImageUrl)
+          // 检查是否是预设选项（A、B、C、D）
+          const isPresetOption = /\/uploads\/(A|B|C|D)\.png$/i.test(answerImagePreview)
+          if (isPresetOption) {
+            // 预设选项，直接使用路径（不需要上传）
+            answerImageUrl = answerImagePreview
+            console.log('编辑模式 - 使用预设选项图片:', answerImageUrl)
+          } else {
+            // 保持原有图片URL（未修改）或使用新的预览URL
+            answerImageUrl = answerImagePreview
+            console.log('答案图片未修改，保持原有URL:', answerImageUrl)
+          }
         } else {
           // 图片被删除，设置为空字符串
           answerImageUrl = ''
           console.log('答案图片已删除')
         }
-      } else if (answerImagePreview && answerImagePreview.startsWith('http')) {
-        // 新增模式：使用预览URL
-        answerImageUrl = answerImagePreview
-        console.log('新增模式答案图片URL:', answerImageUrl)
+      } else if (answerImagePreview && answerImagePreview.length > 0) {
+        // 新增模式：检查是否是预设选项（A、B、C、D）
+        const isPresetOption = /\/uploads\/(A|B|C|D)\.png$/i.test(answerImagePreview)
+        if (isPresetOption) {
+          // 预设选项，直接使用路径（不需要上传）
+          answerImageUrl = answerImagePreview
+          console.log('新增模式 - 使用预设选项图片:', answerImageUrl)
+        } else if (answerImagePreview.startsWith('http')) {
+          // 其他情况：使用预览URL（如 blob URL）
+          answerImageUrl = answerImagePreview
+          console.log('新增模式答案图片URL:', answerImageUrl)
+        } else {
+          // 相对路径或其他情况，直接使用
+          answerImageUrl = answerImagePreview
+          console.log('新增模式答案图片URL（相对路径）:', answerImageUrl)
+        }
       }
       
       const data = {
