@@ -57,6 +57,7 @@ function QuestionForm({
   const [answerImagePreview, setAnswerImagePreview] = useState('')
   const [selectedSubjectId, setSelectedSubjectId] = useState(null)
   const [selectedGradeId, setSelectedGradeId] = useState(null)
+  const [optionImageErrors, setOptionImageErrors] = useState({}) // 记录选项图片加载失败状态
 
   const isEdit = !!question
 
@@ -125,6 +126,7 @@ function QuestionForm({
         setAnswerImagePreview('')
         setQuestionImageFile(null)
         setAnswerImageFile(null)
+        setOptionImageErrors({})
         // 然后重置表单
         form.resetFields()
         // 强制设置默认值
@@ -149,6 +151,7 @@ function QuestionForm({
       setAnswerImagePreview('')
       setQuestionImageFile(null)
       setAnswerImageFile(null)
+      setOptionImageErrors({})
       form.resetFields()
     }
   }, [visible, question, form])
@@ -457,6 +460,119 @@ function QuestionForm({
                       </div>
                     </Upload>
                   )}
+                  
+                  {/* A、B、C、D 选项 */}
+                  <div style={{ marginTop: 16, width: '100%' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-around',
+                      gap: 12,
+                      flexWrap: 'wrap'
+                    }}>
+                      {['A', 'B', 'C', 'D'].map((option) => {
+                        const optionImageUrl = `/uploads/${option}.png`
+                        // 检查是否选中（支持相对路径和绝对路径）
+                        const isSelected = answerImagePreview === optionImageUrl || 
+                                          answerImagePreview?.endsWith(`/${option}.png`) ||
+                                          answerImagePreview?.includes(`/${option}.png`)
+                        return (
+                          <div
+                            key={option}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              cursor: 'pointer'
+                            }}
+                            onClick={() => {
+                              setAnswerImageFile(null)
+                              setAnswerImagePreview(optionImageUrl)
+                              message.success(`已选择选项 ${option}`)
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: 80,
+                                height: 80,
+                                border: isSelected ? '2px solid #1890ff' : '2px solid #d9d9d9',
+                                borderRadius: 8,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: isSelected ? '#e6f7ff' : '#fafafa',
+                                transition: 'all 0.3s',
+                                position: 'relative',
+                                overflow: 'hidden'
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isSelected) {
+                                  e.currentTarget.style.borderColor = '#1890ff'
+                                  e.currentTarget.style.backgroundColor = '#f0f8ff'
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!isSelected) {
+                                  e.currentTarget.style.borderColor = '#d9d9d9'
+                                  e.currentTarget.style.backgroundColor = '#fafafa'
+                                }
+                              }}
+                            >
+                              {/* 预览图片或文字 */}
+                              {optionImageErrors[option] ? (
+                                // 图片加载失败，显示文字
+                                <div style={{
+                                  fontSize: 32,
+                                  fontWeight: 'bold',
+                                  color: isSelected ? '#1890ff' : '#595959',
+                                  marginBottom: 4
+                                }}>
+                                  {option}
+                                </div>
+                              ) : (
+                                // 显示图片
+                                <Image
+                                  src={optionImageUrl}
+                                  alt={`选项 ${option}`}
+                                  width={60}
+                                  height={50}
+                                  style={{
+                                    objectFit: 'contain',
+                                    marginBottom: 4
+                                  }}
+                                  preview={{
+                                    mask: <EyeOutlined />
+                                  }}
+                                  onError={() => {
+                                    // 图片加载失败，记录状态
+                                    setOptionImageErrors(prev => ({ ...prev, [option]: true }))
+                                  }}
+                                />
+                              )}
+                              {/* 选项标签 */}
+                              <div style={{
+                                position: 'absolute',
+                                bottom: 4,
+                                fontSize: 12,
+                                fontWeight: 'bold',
+                                color: isSelected ? '#1890ff' : '#8c8c8c'
+                              }}>
+                                {option}
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    <div style={{ 
+                      marginTop: 12, 
+                      fontSize: 12, 
+                      color: '#8c8c8c',
+                      textAlign: 'center'
+                    }}>
+                      点击选项快速选择预设答案图片（A.png、B.png、C.png、D.png）
+                    </div>
+                  </div>
                 </div>
               </Form.Item>
             </Col>
