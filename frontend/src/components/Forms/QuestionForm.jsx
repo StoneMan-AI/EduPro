@@ -57,7 +57,6 @@ function QuestionForm({
   const [answerImagePreview, setAnswerImagePreview] = useState('')
   const [selectedSubjectId, setSelectedSubjectId] = useState(null)
   const [selectedGradeId, setSelectedGradeId] = useState(null)
-  const [optionImageErrors, setOptionImageErrors] = useState({}) // 记录选项图片加载失败状态
 
   const isEdit = !!question
 
@@ -126,7 +125,6 @@ function QuestionForm({
         setAnswerImagePreview('')
         setQuestionImageFile(null)
         setAnswerImageFile(null)
-        setOptionImageErrors({})
         // 然后重置表单
         form.resetFields()
         // 强制设置默认值
@@ -151,7 +149,6 @@ function QuestionForm({
       setAnswerImagePreview('')
       setQuestionImageFile(null)
       setAnswerImageFile(null)
-      setOptionImageErrors({})
       form.resetFields()
     }
   }, [visible, question, form])
@@ -522,8 +519,7 @@ function QuestionForm({
                                 justifyContent: 'center',
                                 backgroundColor: isSelected ? '#e6f7ff' : '#fafafa',
                                 transition: 'all 0.3s',
-                                position: 'relative',
-                                overflow: 'hidden'
+                                position: 'relative'
                               }}
                               onMouseEnter={(e) => {
                                 if (!isSelected) {
@@ -538,44 +534,12 @@ function QuestionForm({
                                 }
                               }}
                             >
-                              {/* 预览图片或文字 */}
-                              {optionImageErrors[option] ? (
-                                // 图片加载失败，显示文字
-                                <div style={{
-                                  fontSize: 32,
-                                  fontWeight: 'bold',
-                                  color: isSelected ? '#1890ff' : '#595959',
-                                  marginBottom: 4
-                                }}>
-                                  {option}
-                                </div>
-                              ) : (
-                                // 显示图片
-                                <Image
-                                  src={optionImageUrl}
-                                  alt={`选项 ${option}`}
-                                  width={60}
-                                  height={50}
-                                  style={{
-                                    objectFit: 'contain',
-                                    marginBottom: 4
-                                  }}
-                                  preview={{
-                                    mask: <EyeOutlined />
-                                  }}
-                                  onError={() => {
-                                    // 图片加载失败，记录状态
-                                    setOptionImageErrors(prev => ({ ...prev, [option]: true }))
-                                  }}
-                                />
-                              )}
-                              {/* 选项标签 */}
+                              {/* 选项字母 */}
                               <div style={{
-                                position: 'absolute',
-                                bottom: 4,
-                                fontSize: 12,
+                                fontSize: 36,
                                 fontWeight: 'bold',
-                                color: isSelected ? '#1890ff' : '#8c8c8c'
+                                color: isSelected ? '#1890ff' : '#595959',
+                                lineHeight: 1
                               }}>
                                 {option}
                               </div>
