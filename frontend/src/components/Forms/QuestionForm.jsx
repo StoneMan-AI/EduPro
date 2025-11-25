@@ -258,8 +258,8 @@ function QuestionForm({
       } else if (isEdit) {
         // 编辑模式：检查图片是否被删除或修改
         if (answerImagePreview && answerImagePreview.length > 0) {
-          // 检查是否是预设选项（A、B、C、D）
-          const isPresetOption = /\/uploads\/(A|B|C|D)\.png$/i.test(answerImagePreview)
+          // 检查是否是预设选项（A、B、C、D、dui、cuo）
+          const isPresetOption = /\/uploads\/(A|B|C|D|dui|cuo)\.png$/i.test(answerImagePreview)
           if (isPresetOption) {
             // 预设选项，直接使用路径（不需要上传）
             answerImageUrl = answerImagePreview
@@ -275,8 +275,8 @@ function QuestionForm({
           console.log('答案图片已删除')
         }
       } else if (answerImagePreview && answerImagePreview.length > 0) {
-        // 新增模式：检查是否是预设选项（A、B、C、D）
-        const isPresetOption = /\/uploads\/(A|B|C|D)\.png$/i.test(answerImagePreview)
+        // 新增模式：检查是否是预设选项（A、B、C、D、dui、cuo）
+        const isPresetOption = /\/uploads\/(A|B|C|D|dui|cuo)\.png$/i.test(answerImagePreview)
         if (isPresetOption) {
           // 预设选项，直接使用路径（不需要上传）
           answerImageUrl = answerImagePreview
@@ -478,7 +478,7 @@ function QuestionForm({
                     </Upload>
                   )}
                   
-                  {/* A、B、C、D 选项 */}
+                  {/* A、B、C、D、对、错 选项 */}
                   <div style={{ marginTop: 16, width: '100%' }}>
                     <div style={{ 
                       display: 'flex', 
@@ -486,15 +486,22 @@ function QuestionForm({
                       gap: 12,
                       flexWrap: 'wrap'
                     }}>
-                      {['A', 'B', 'C', 'D'].map((option) => {
-                        const optionImageUrl = `/uploads/${option}.png`
+                      {[
+                        { key: 'A', label: 'A' },
+                        { key: 'B', label: 'B' },
+                        { key: 'C', label: 'C' },
+                        { key: 'D', label: 'D' },
+                        { key: 'dui', label: '对' },
+                        { key: 'cuo', label: '错' }
+                      ].map((option) => {
+                        const optionImageUrl = `/uploads/${option.key}.png`
                         // 检查是否选中（支持相对路径和绝对路径）
                         const isSelected = answerImagePreview === optionImageUrl || 
-                                          answerImagePreview?.endsWith(`/${option}.png`) ||
-                                          answerImagePreview?.includes(`/${option}.png`)
+                                          answerImagePreview?.endsWith(`/${option.key}.png`) ||
+                                          answerImagePreview?.includes(`/${option.key}.png`)
                         return (
                           <div
-                            key={option}
+                            key={option.key}
                             style={{
                               display: 'flex',
                               flexDirection: 'column',
@@ -504,7 +511,7 @@ function QuestionForm({
                             onClick={() => {
                               setAnswerImageFile(null)
                               setAnswerImagePreview(optionImageUrl)
-                              message.success(`已选择选项 ${option}`)
+                              message.success(`已选择选项 ${option.label}`)
                             }}
                           >
                             <div
@@ -534,14 +541,14 @@ function QuestionForm({
                                 }
                               }}
                             >
-                              {/* 选项字母 */}
+                              {/* 选项文字 */}
                               <div style={{
-                                fontSize: 36,
+                                fontSize: option.key === 'dui' || option.key === 'cuo' ? 24 : 36,
                                 fontWeight: 'bold',
                                 color: isSelected ? '#1890ff' : '#595959',
                                 lineHeight: 1
                               }}>
-                                {option}
+                                {option.label}
                               </div>
                             </div>
                           </div>
@@ -554,7 +561,7 @@ function QuestionForm({
                       color: '#8c8c8c',
                       textAlign: 'center'
                     }}>
-                      点击选项快速选择预设答案图片（A.png、B.png、C.png、D.png）
+                      点击选项快速选择预设答案图片（A.png、B.png、C.png、D.png、dui.png、cuo.png）
                     </div>
                   </div>
                 </div>
