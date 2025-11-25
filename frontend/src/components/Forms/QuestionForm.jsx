@@ -479,11 +479,11 @@ function QuestionForm({
                   )}
                   
                   {/* A、B、C、D、对、错 选项 */}
-                  <div style={{ marginTop: 16, width: '100%' }}>
+                  <div style={{ marginTop: 12, width: '100%' }}>
                     <div style={{ 
                       display: 'flex', 
                       justifyContent: 'space-around',
-                      gap: 12,
+                      gap: 8,
                       flexWrap: 'wrap'
                     }}>
                       {[
@@ -516,10 +516,10 @@ function QuestionForm({
                           >
                             <div
                               style={{
-                                width: 80,
-                                height: 80,
-                                border: isSelected ? '2px solid #1890ff' : '2px solid #d9d9d9',
-                                borderRadius: 8,
+                                width: 40,
+                                height: 40,
+                                border: isSelected ? '2px solid #1890ff' : '1px solid #d9d9d9',
+                                borderRadius: 4,
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
@@ -543,7 +543,7 @@ function QuestionForm({
                             >
                               {/* 选项文字 */}
                               <div style={{
-                                fontSize: option.key === 'dui' || option.key === 'cuo' ? 24 : 36,
+                                fontSize: option.key === 'dui' || option.key === 'cuo' ? 12 : 18,
                                 fontWeight: 'bold',
                                 color: isSelected ? '#1890ff' : '#595959',
                                 lineHeight: 1
