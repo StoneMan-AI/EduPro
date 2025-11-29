@@ -48,7 +48,7 @@ const questionsAPI = {
   getGrades: () => api.get('/config/grades'),
   getQuestionTypes: () => api.get('/config/question-types'),
   getDifficultyLevels: () => api.get('/config/difficulty-levels'),
-  getKnowledgePoints: () => api.get('/knowledge-points')
+  getKnowledgePoints: (params) => api.get('/knowledge-points', { params })
 }
 
 function Questions() {
@@ -106,12 +106,16 @@ function Questions() {
     staleTime: 5 * 60 * 1000
   })
   // 知识点数据：只有当学科和年级都选择后才获取
-  const { data: knowledgePointsData } = useQuery(
-    ['knowledgePoints', searchSubjectId, searchGradeId],
-    () => questionsAPI.getKnowledgePoints({ 
-      subject_id: searchSubjectId, 
-      grade_id: searchGradeId 
-    }),
+  const { data: knowledgePointsData, isLoading: isLoadingKnowledgePoints } = useQuery(
+    ['knowledgePoints', 'search', searchSubjectId, searchGradeId],
+    () => {
+      const params = {
+        subject_id: searchSubjectId,
+        grade_id: searchGradeId
+      }
+      console.log('获取知识点数据，参数:', params)
+      return questionsAPI.getKnowledgePoints(params)
+    },
     {
       retry: 3,
       retryDelay: 1000,
@@ -126,6 +130,21 @@ function Questions() {
   const questionTypes = Array.isArray(questionTypesData?.data) ? questionTypesData.data : []
   const difficultyLevels = Array.isArray(difficultyLevelsData?.data) ? difficultyLevelsData.data : []
   const knowledgePoints = Array.isArray(knowledgePointsData?.data) ? knowledgePointsData.data : []
+  
+  // 调试日志
+  if (searchSubjectId && searchGradeId && knowledgePoints.length > 0) {
+    console.log('知识点数据:', {
+      searchSubjectId,
+      searchGradeId,
+      count: knowledgePoints.length,
+      knowledgePoints: knowledgePoints.map(kp => ({ 
+        id: kp.id, 
+        name: kp.name, 
+        subject_id: kp.subject_id, 
+        grade_id: kp.grade_id 
+      }))
+    })
+  }
 
   // 删除题目
   const deleteMutation = useMutation(questionsAPI.deleteQuestion, {
