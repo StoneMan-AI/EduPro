@@ -7,6 +7,7 @@ import {
   Modal,
   Form,
   Input,
+  InputNumber,
   Select,
   Tree,
   Row,
@@ -34,7 +35,8 @@ const knowledgePointsAPI = {
   createKnowledgePoint: (data) => api.post('/knowledge-points', data),
   updateKnowledgePoint: (id, data) => api.put(`/knowledge-points/${id}`, data),
   deleteKnowledgePoint: (id) => api.delete(`/knowledge-points/${id}`),
-  getSubjects: () => api.get('/config/subjects')
+  getSubjects: () => api.get('/config/subjects'),
+  getGrades: () => api.get('/config/grades')
 }
 
 function KnowledgePoints() {
@@ -62,9 +64,23 @@ function KnowledgePoints() {
   )
 
   // 获取学科列表和年级列表
-  const { data: subjectsData } = useQuery('subjects', knowledgePointsAPI.getSubjects)
-  const { data: gradesData } = useQuery('grades', () => 
-    api.get('/config/grades').then(res => res.data || [])
+  const { data: subjectsData, isLoading: isLoadingSubjects } = useQuery(
+    'subjects', 
+    knowledgePointsAPI.getSubjects,
+    {
+      retry: 3,
+      retryDelay: 1000,
+      staleTime: 5 * 60 * 1000 // 5分钟
+    }
+  )
+  const { data: gradesData, isLoading: isLoadingGrades, error: gradesError } = useQuery(
+    'grades', 
+    knowledgePointsAPI.getGrades,
+    {
+      retry: 3,
+      retryDelay: 1000,
+      staleTime: 5 * 60 * 1000 // 5分钟
+    }
   )
 
   // 安全处理数据，确保是数组格式
@@ -162,6 +178,13 @@ function KnowledgePoints() {
       render: (text) => text || '根节点'
     },
     {
+      title: '权重',
+      dataIndex: 'weight',
+      width: 100,
+      sorter: (a, b) => a.weight - b.weight,
+      render: (weight) => weight || 0
+    },
+    {
       title: '描述',
       dataIndex: 'description',
       ellipsis: true
@@ -234,6 +257,7 @@ function KnowledgePoints() {
       subject_id: knowledgePoint.subject_id,
       grade_id: knowledgePoint.grade_id,
       parent_id: knowledgePoint.parent_id,
+      weight: knowledgePoint.weight || 0,
       description: knowledgePoint.description,
       is_active: knowledgePoint.is_active
     })
@@ -396,7 +420,8 @@ function KnowledgePoints() {
           form={form}
           layout="vertical"
           initialValues={{
-            is_active: true
+            is_active: true,
+            weight: 0
           }}
         >
           <Form.Item
@@ -460,6 +485,23 @@ function KnowledgePoints() {
               placeholder="请选择父知识点（可选）"
               allowClear
               options={getParentOptions()}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="weight"
+            label="权重"
+            rules={[
+              { type: 'number', min: 0, message: '权重不能小于0' },
+              { type: 'number', max: 9999, message: '权重不能大于9999' }
+            ]}
+            initialValue={0}
+          >
+            <InputNumber 
+              placeholder="请输入权重（0-9999）"
+              min={0}
+              max={9999}
+              style={{ width: '100%' }}
             />
           </Form.Item>
 

@@ -10,6 +10,7 @@ router.get('/', async (req, res, next) => {
       page_size = 20,
       subject_id,
       grade_id,
+      knowledge_point_id,
       question_type_id,
       difficulty_id,
       status
@@ -18,6 +19,7 @@ router.get('/', async (req, res, next) => {
     const where = {};
     if (subject_id) where.subject_id = subject_id;
     if (grade_id) where.grade_id = grade_id;
+    if (knowledge_point_id) where.knowledge_point_id = knowledge_point_id;
     if (question_type_id) where.question_type_id = question_type_id;
     if (difficulty_id) where.difficulty_id = difficulty_id;
     if (status) where.status = status;

@@ -63,6 +63,9 @@ function Questions() {
     page: 1,
     page_size: 20
   })
+  // 搜索表单中的学科和年级（用于动态获取知识点）
+  const [searchSubjectId, setSearchSubjectId] = useState(null)
+  const [searchGradeId, setSearchGradeId] = useState(null)
 
   // 获取题目列表
   const { data: questionsData, isLoading, refetch } = useQuery(
@@ -76,15 +79,46 @@ function Questions() {
 
   // 安全处理题目数据
   const questions = questionsData?.data || []
-  const pagination = questionsData?.pagination || { total: 0, page: 1, page_size: 20 }
-  const total = pagination.total || 0
+  // 后端返回的分页信息在根级别，不在 pagination 对象中
+  const total = questionsData?.total || 0
+  const currentPage = questionsData?.page || 1
+  const pageSize = questionsData?.page_size || 20
 
   // 获取配置数据
-  const { data: subjectsData } = useQuery('subjects', questionsAPI.getSubjects)
-  const { data: gradesData } = useQuery('grades', questionsAPI.getGrades)
-  const { data: questionTypesData } = useQuery('questionTypes', questionsAPI.getQuestionTypes)
-  const { data: difficultyLevelsData } = useQuery('difficultyLevels', questionsAPI.getDifficultyLevels)
-  const { data: knowledgePointsData } = useQuery('knowledgePoints', questionsAPI.getKnowledgePoints)
+  const { data: subjectsData } = useQuery('subjects', questionsAPI.getSubjects, {
+    retry: 3,
+    retryDelay: 1000,
+    staleTime: 5 * 60 * 1000 // 5分钟
+  })
+  const { data: gradesData, error: gradesError } = useQuery('grades', questionsAPI.getGrades, {
+    retry: 3,
+    retryDelay: 1000,
+    staleTime: 5 * 60 * 1000 // 5分钟
+  })
+  const { data: questionTypesData } = useQuery('questionTypes', questionsAPI.getQuestionTypes, {
+    retry: 3,
+    retryDelay: 1000,
+    staleTime: 5 * 60 * 1000
+  })
+  const { data: difficultyLevelsData } = useQuery('difficultyLevels', questionsAPI.getDifficultyLevels, {
+    retry: 3,
+    retryDelay: 1000,
+    staleTime: 5 * 60 * 1000
+  })
+  // 知识点数据：只有当学科和年级都选择后才获取
+  const { data: knowledgePointsData } = useQuery(
+    ['knowledgePoints', searchSubjectId, searchGradeId],
+    () => questionsAPI.getKnowledgePoints({ 
+      subject_id: searchSubjectId, 
+      grade_id: searchGradeId 
+    }),
+    {
+      retry: 3,
+      retryDelay: 1000,
+      staleTime: 5 * 60 * 1000,
+      enabled: !!searchSubjectId && !!searchGradeId // 只有学科和年级都选择后才获取
+    }
+  )
 
   // 安全处理数据，确保是数组格式
   const subjects = Array.isArray(subjectsData?.data) ? subjectsData.data : []
@@ -287,10 +321,48 @@ function Questions() {
 
   // 事件处理函数
   const handleSearch = (values) => {
+    // 同步学科和年级状态（用于动态获取知识点）
+    if (values.subject_id !== undefined) {
+      setSearchSubjectId(values.subject_id || null)
+    }
+    if (values.grade_id !== undefined) {
+      setSearchGradeId(values.grade_id || null)
+    }
+    
+    // 过滤掉空值，确保清空的条件能正确传递
+    const filteredValues = Object.keys(values).reduce((acc, key) => {
+      if (values[key] !== undefined && values[key] !== null && values[key] !== '') {
+        acc[key] = values[key]
+      } else {
+        acc[key] = undefined // 明确设置为 undefined，以便后端忽略
+      }
+      return acc
+    }, {})
+    
     setSearchParams({ 
-      ...searchParams, 
-      ...values, 
-      page: 1 
+      page: 1,
+      page_size: searchParams.page_size || 20,
+      ...filteredValues
+    })
+  }
+
+  // 处理学科选择变化
+  const handleSearchSubjectChange = (subjectId) => {
+    setSearchSubjectId(subjectId || null)
+    // 学科改变时，清空年级和知识点
+    setSearchGradeId(null)
+    form.setFieldsValue({
+      grade_id: undefined,
+      knowledge_point_id: undefined
+    })
+  }
+
+  // 处理年级选择变化
+  const handleSearchGradeChange = (gradeId) => {
+    setSearchGradeId(gradeId || null)
+    // 年级改变时，清空知识点
+    form.setFieldsValue({
+      knowledge_point_id: undefined
     })
   }
 
@@ -399,6 +471,7 @@ function Questions() {
               placeholder="选择学科" 
               style={{ width: 120 }} 
               allowClear
+              onChange={handleSearchSubjectChange}
             >
               {subjects.map(subject => (
                 <Option key={subject.id} value={subject.id}>
@@ -413,10 +486,26 @@ function Questions() {
               placeholder="选择年级" 
               style={{ width: 120 }} 
               allowClear
+              onChange={handleSearchGradeChange}
             >
               {grades.map(grade => (
                 <Option key={grade.id} value={grade.id}>
                   {grade.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          
+          <Form.Item name="knowledge_point_id">
+            <Select 
+              placeholder={searchSubjectId && searchGradeId ? "选择知识点" : "请先选择学科和年级"} 
+              style={{ width: 150 }} 
+              allowClear
+              disabled={!searchSubjectId || !searchGradeId}
+            >
+              {knowledgePoints.map(kp => (
+                <Option key={kp.id} value={kp.id}>
+                  {kp.name}
                 </Option>
               ))}
             </Select>
@@ -497,8 +586,8 @@ function Questions() {
           rowKey="id"
           loading={isLoading}
           pagination={{
-            current: searchParams.page,
-            pageSize: searchParams.page_size,
+            current: searchParams.page || currentPage,
+            pageSize: searchParams.page_size || pageSize,
             total,
             showSizeChanger: true,
             showQuickJumper: true,

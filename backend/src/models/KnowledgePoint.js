@@ -32,6 +32,12 @@ module.exports = (sequelize) => {
       allowNull: true,
       comment: '知识点描述'
     },
+    weight: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      comment: '知识点权重，用于排序和优先级计算'
+    },
     is_active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,

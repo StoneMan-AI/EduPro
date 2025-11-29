@@ -65,10 +65,26 @@ function Config() {
   const [modalType, setModalType] = useState('subjects')
 
   // 数据查询
-  const { data: subjectsData, refetch: refetchSubjects } = useQuery('subjects', configAPI.getSubjects)
-  const { data: gradesData, refetch: refetchGrades } = useQuery('grades', configAPI.getGrades)
-  const { data: questionTypesData, refetch: refetchQuestionTypes } = useQuery('questionTypes', configAPI.getQuestionTypes)
-  const { data: difficultyLevelsData, refetch: refetchDifficultyLevels } = useQuery('difficultyLevels', configAPI.getDifficultyLevels)
+  const { data: subjectsData, refetch: refetchSubjects } = useQuery('subjects', configAPI.getSubjects, {
+    retry: 3,
+    retryDelay: 1000,
+    staleTime: 5 * 60 * 1000
+  })
+  const { data: gradesData, refetch: refetchGrades, error: gradesError } = useQuery('grades', configAPI.getGrades, {
+    retry: 3,
+    retryDelay: 1000,
+    staleTime: 5 * 60 * 1000
+  })
+  const { data: questionTypesData, refetch: refetchQuestionTypes } = useQuery('questionTypes', configAPI.getQuestionTypes, {
+    retry: 3,
+    retryDelay: 1000,
+    staleTime: 5 * 60 * 1000
+  })
+  const { data: difficultyLevelsData, refetch: refetchDifficultyLevels } = useQuery('difficultyLevels', configAPI.getDifficultyLevels, {
+    retry: 3,
+    retryDelay: 1000,
+    staleTime: 5 * 60 * 1000
+  })
 
   // 安全处理数据，确保是数组格式
   const subjects = Array.isArray(subjectsData?.data) ? subjectsData.data : []

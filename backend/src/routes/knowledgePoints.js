@@ -22,7 +22,7 @@ router.get('/', async (req, res, next) => {
           attributes: ['id', 'name']
         }
       ],
-      order: [['created_at', 'DESC']]
+      order: [['weight', 'DESC'], ['created_at', 'DESC']]
     });
 
     // 格式化返回数据

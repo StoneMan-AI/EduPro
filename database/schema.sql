@@ -39,6 +39,7 @@ CREATE TABLE knowledge_points (
     grade_id INTEGER REFERENCES grades(id) ON DELETE CASCADE,
     parent_id INTEGER REFERENCES knowledge_points(id) ON DELETE CASCADE,
     description TEXT,
+    weight INTEGER DEFAULT 0,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
