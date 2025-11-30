@@ -18,7 +18,7 @@ import {
   EyeOutlined,
   LoadingOutlined
 } from '@ant-design/icons'
-import { useMutation } from 'react-query'
+import { useMutation, useQuery } from 'react-query'
 import api from '@/services/api'
 
 const { Option } = Select
@@ -80,11 +80,44 @@ function QuestionForm({
     }
   )
 
-  // 过滤知识点 - 根据学科和年级双重筛选
-  const filteredKnowledgePoints = knowledgePoints.filter(
-    kp => kp.subject_id === selectedSubjectId && 
-          kp.grade_id === selectedGradeId
+  // 根据表单中选择的学科和年级动态获取知识点
+  const { data: formKnowledgePointsData } = useQuery(
+    ['knowledgePoints', 'form', selectedSubjectId, selectedGradeId],
+    () => {
+      const params = {
+        subject_id: selectedSubjectId,
+        grade_id: selectedGradeId
+      }
+      console.log('QuestionForm - 获取知识点数据，参数:', params)
+      return api.get('/knowledge-points', { params })
+    },
+    {
+      retry: 3,
+      retryDelay: 1000,
+      staleTime: 5 * 60 * 1000,
+      enabled: !!selectedSubjectId && !!selectedGradeId // 只有学科和年级都选择后才获取
+    }
   )
+
+  // 使用动态获取的知识点数据（后端已经根据学科和年级过滤）
+  const filteredKnowledgePoints = Array.isArray(formKnowledgePointsData?.data) 
+    ? formKnowledgePointsData.data 
+    : []
+  
+  // 调试日志
+  if (selectedSubjectId && selectedGradeId) {
+    console.log('QuestionForm - 知识点数据:', {
+      selectedSubjectId,
+      selectedGradeId,
+      count: filteredKnowledgePoints.length,
+      knowledgePoints: filteredKnowledgePoints.map(kp => ({ 
+        id: kp.id, 
+        name: kp.name, 
+        subject_id: kp.subject_id, 
+        grade_id: kp.grade_id 
+      }))
+    })
+  }
 
   // 初始化表单
   useEffect(() => {
@@ -323,14 +356,18 @@ function QuestionForm({
 
   // 学科改变时重置知识点
   const handleSubjectChange = (value) => {
-    setSelectedSubjectId(value)
+    const subjectId = value || null
+    setSelectedSubjectId(subjectId)
     form.setFieldValue('knowledge_point_id', undefined)
+    console.log('QuestionForm - 学科改变:', subjectId)
   }
 
   // 年级改变时重置知识点
   const handleGradeChange = (value) => {
-    setSelectedGradeId(value)
+    const gradeId = value || null
+    setSelectedGradeId(gradeId)
     form.setFieldValue('knowledge_point_id', undefined)
+    console.log('QuestionForm - 年级改变:', gradeId)
   }
 
   const uploadButton = (
@@ -630,16 +667,19 @@ function QuestionForm({
               >
                 <Select 
                   placeholder={
-                    !form.getFieldValue('subject_id') || !form.getFieldValue('grade_id') 
+                    !selectedSubjectId || !selectedGradeId 
                       ? "请先选择学科和年级" 
+                      : filteredKnowledgePoints.length === 0
+                      ? "暂无知识点数据"
                       : "请选择知识点"
                   }
                   allowClear
-                  disabled={!form.getFieldValue('subject_id') || !form.getFieldValue('grade_id')}
+                  disabled={!selectedSubjectId || !selectedGradeId}
+                  loading={selectedSubjectId && selectedGradeId && !formKnowledgePointsData}
                 >
                   {filteredKnowledgePoints.map(kp => (
                     <Option key={kp.id} value={kp.id}>
-                      {kp.name} {kp.grade_name && `(${kp.grade_name})`}
+                      {kp.name}
                     </Option>
                   ))}
                 </Select>
