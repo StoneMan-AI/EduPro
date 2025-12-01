@@ -260,12 +260,7 @@ function Questions() {
     {
       title: '题型',
       dataIndex: 'question_type_name',
-      width: 100,
-      render: (text) => (
-        <Tag color="orange" style={{ backgroundColor: '#fff7e6', borderColor: '#ffd591', color: '#d46b08' }}>
-          {text}
-        </Tag>
-      )
+      width: 100
     },
     {
       title: '难度',
@@ -320,7 +315,7 @@ function Questions() {
           <Button
             size="small"
             icon={<EyeOutlined />}
-            onClick={() => handleView(record, questions.indexOf(record))}
+            onClick={() => handleView(record)}
           >
             查看
           </Button>
@@ -395,45 +390,12 @@ function Questions() {
     setIsModalVisible(true)
   }
 
-  const handleView = (question, index) => {
-    // 计算题目序号（基于当前页和页码）
-    const questionNumber = index !== undefined 
-      ? index + 1 + (searchParams.page - 1) * (searchParams.page_size || 20)
-      : question.id
-    
+  const handleView = (question) => {
     Modal.info({
       title: '题目详情',
       width: 800,
       content: (
         <div style={{ marginTop: 16 }}>
-          {/* 题目序号和知识点 */}
-          <div style={{ 
-            marginBottom: 16, 
-            padding: '12px 16px', 
-            background: '#f5f5f5', 
-            borderRadius: 4,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12
-          }}>
-            {question.knowledge_point_name && (
-              <span style={{ 
-                fontSize: 14, 
-                fontWeight: 500,
-                color: '#595959'
-              }}>
-                {question.knowledge_point_name}
-              </span>
-            )}
-            <span style={{ 
-              fontSize: 14, 
-              fontWeight: 500,
-              color: '#595959'
-            }}>
-              第{questionNumber}题
-            </span>
-          </div>
-          
           <Row gutter={16}>
             <Col span={12}>
               <p><strong>题干图:</strong></p>
@@ -460,12 +422,7 @@ function Questions() {
             <p><strong>学科:</strong> {question.subject_name}</p>
             <p><strong>年级:</strong> {question.grade_name}</p>
             <p><strong>知识点:</strong> {question.knowledge_point_name}</p>
-            <p>
-              <strong>题型:</strong>{' '}
-              <Tag color="orange" style={{ backgroundColor: '#fff7e6', borderColor: '#ffd591', color: '#d46b08' }}>
-                {question.question_type_name}
-              </Tag>
-            </p>
+            <p><strong>题型:</strong> {question.question_type_name}</p>
             <p><strong>难度:</strong> {question.difficulty_name}</p>
             <p><strong>状态:</strong> {question.status}</p>
             {question.remarks && <p><strong>备注:</strong> {question.remarks}</p>}
