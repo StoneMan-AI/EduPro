@@ -51,6 +51,11 @@ api.interceptors.response.use(
         case 404:
           message.error('请求的资源不存在')
           break
+        case 429:
+          // 429 Too Many Requests - 请求过于频繁
+          const retryAfter = response.headers['retry-after'] || data?.retryAfter || 60
+          message.warning(`请求过于频繁，请 ${retryAfter} 秒后再试`)
+          break
         case 500:
           message.error('服务器内部错误')
           break

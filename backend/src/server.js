@@ -24,21 +24,34 @@ const PORT = process.env.PORT || 5001;
 // 只信任第一个代理（Nginx），而不是所有代理，提高安全性
 app.set('trust proxy', 1);
 
-// 速率限制
-const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW) || 1 * 60 * 1000, // 15分钟
-  max: parseInt(process.env.RATE_LIMIT_MAX) || 100, // 限制每个IP 100次请求
-  message: '请求过于频繁，请稍后再试',
-  // 使用标准化的速率限制头部
+// 速率限制 - 内部系统，默认禁用限流
+// 如需启用限流，设置环境变量 RATE_LIMIT_ENABLED=true
+const rateLimitEnabled = process.env.RATE_LIMIT_ENABLED === 'true';
+
+// 创建一个空的中间件（不限制）
+const noLimit = (req, res, next) => next();
+
+// 如果启用限流，则创建限流中间件；否则使用空中间件
+const limiter = rateLimitEnabled ? rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW) || 15 * 60 * 1000, // 15分钟
+  max: parseInt(process.env.RATE_LIMIT_MAX) || 10000, // 10000次请求（15分钟内）
+  message: {
+    success: false,
+    message: '请求过于频繁，请稍后再试',
+    retryAfter: Math.ceil((parseInt(process.env.RATE_LIMIT_WINDOW) || 15 * 60 * 1000) / 1000)
+  },
   standardHeaders: true,
   legacyHeaders: false
-});
+}) : noLimit;
+
+// 配置类 API 使用相同的限流策略
+const configLimiter = limiter;
 
 // 中间件
 app.use(helmet()); // 安全头部
 app.use(compression()); // 响应压缩
 app.use(morgan('combined')); // 日志记录
-app.use(limiter); // 速率限制
+// 注意：限流在路由级别应用，不在全局应用
 
 // CORS 配置
 app.use(cors({
@@ -84,7 +97,11 @@ app.get('/', (req, res) => {
 });
 
 // API 路由
-app.use('/api', routes);
+// 配置类 API 使用更宽松的限流（先注册，优先匹配）
+app.use('/api/config', configLimiter, require('./routes/config'));
+
+// 其他 API 使用通用限流
+app.use('/api', limiter, routes);
 
 // 404 处理
 app.use(notFound);
