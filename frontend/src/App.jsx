@@ -4,6 +4,7 @@ import { Layout } from 'antd'
 import Sidebar from '@/components/Layout/Sidebar'
 import Header from '@/components/Layout/Header'
 import Questions from '@/pages/Questions'
+import Videos from '@/pages/Videos'
 import KnowledgePoints from '@/pages/KnowledgePoints'
 import Config from '@/pages/Config'
 import Uploads from '@/pages/Uploads'
@@ -28,6 +29,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Navigate to="/questions" replace />} />
               <Route path="/questions" element={<Questions />} />
+              <Route path="/videos" element={<Videos />} />
               <Route path="/knowledge-points" element={<KnowledgePoints />} />
               <Route path="/config" element={<Config />} />
               <Route path="/uploads" element={<Uploads />} />

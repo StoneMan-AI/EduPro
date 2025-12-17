@@ -46,6 +46,7 @@ const QuestionType = require('./QuestionType')(sequelize);
 const DifficultyLevel = require('./DifficultyLevel')(sequelize);
 const KnowledgePoint = require('./KnowledgePoint')(sequelize);
 const Question = require('./Question')(sequelize);
+const LearningVideo = require('./LearningVideo')(sequelize);
 
 // 定义关联关系
 const defineAssociations = () => {
@@ -53,6 +54,10 @@ const defineAssociations = () => {
   Subject.hasMany(Question, { 
     foreignKey: 'subject_id', 
     as: 'questions' 
+  });
+  Subject.hasMany(LearningVideo, {
+    foreignKey: 'subject_id',
+    as: 'learningVideos'
   });
   Subject.hasMany(KnowledgePoint, { 
     foreignKey: 'subject_id', 
@@ -64,6 +69,10 @@ const defineAssociations = () => {
     foreignKey: 'grade_id', 
     as: 'questions' 
   });
+  Grade.hasMany(LearningVideo, {
+    foreignKey: 'grade_id',
+    as: 'learningVideos'
+  });
   Grade.hasMany(KnowledgePoint, { 
     foreignKey: 'grade_id', 
     as: 'knowledgePoints' 
@@ -74,11 +83,19 @@ const defineAssociations = () => {
     foreignKey: 'question_type_id', 
     as: 'questions' 
   });
+  QuestionType.hasMany(LearningVideo, {
+    foreignKey: 'question_type_id',
+    as: 'learningVideos'
+  });
 
   // DifficultyLevel 关联
   DifficultyLevel.hasMany(Question, { 
     foreignKey: 'difficulty_id', 
     as: 'questions' 
+  });
+  DifficultyLevel.hasMany(LearningVideo, {
+    foreignKey: 'difficulty_id',
+    as: 'learningVideos'
   });
 
   // KnowledgePoint 关联
@@ -93,6 +110,10 @@ const defineAssociations = () => {
   KnowledgePoint.hasMany(Question, { 
     foreignKey: 'knowledge_point_id', 
     as: 'questions' 
+  });
+  KnowledgePoint.hasMany(LearningVideo, {
+    foreignKey: 'knowledge_point_id',
+    as: 'learningVideos'
   });
   KnowledgePoint.hasMany(KnowledgePoint, { 
     foreignKey: 'parent_id', 
@@ -124,6 +145,28 @@ const defineAssociations = () => {
     foreignKey: 'knowledge_point_id', 
     as: 'knowledgePoint' 
   });
+
+  // LearningVideo 关联
+  LearningVideo.belongsTo(Subject, {
+    foreignKey: 'subject_id',
+    as: 'subject'
+  });
+  LearningVideo.belongsTo(Grade, {
+    foreignKey: 'grade_id',
+    as: 'grade'
+  });
+  LearningVideo.belongsTo(KnowledgePoint, {
+    foreignKey: 'knowledge_point_id',
+    as: 'knowledgePoint'
+  });
+  LearningVideo.belongsTo(QuestionType, {
+    foreignKey: 'question_type_id',
+    as: 'questionType'
+  });
+  LearningVideo.belongsTo(DifficultyLevel, {
+    foreignKey: 'difficulty_id',
+    as: 'difficultyLevel'
+  });
 };
 
 // 执行关联定义
@@ -137,5 +180,6 @@ module.exports = {
   QuestionType,
   DifficultyLevel,
   KnowledgePoint,
-  Question
+  Question,
+  LearningVideo
 };

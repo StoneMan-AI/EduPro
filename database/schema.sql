@@ -86,6 +86,32 @@ CREATE INDEX idx_knowledge_points_subject ON knowledge_points(subject_id);
 CREATE INDEX idx_knowledge_points_grade ON knowledge_points(grade_id);
 CREATE INDEX idx_knowledge_points_parent ON knowledge_points(parent_id);
 
+-- 学习视频表（与“题目管理”页保持一致的筛选字段）
+CREATE TABLE learning_videos (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(200),
+    cover_image_url VARCHAR(500), -- 封面图路径（展示图）
+    video_url VARCHAR(500),       -- 视频文件路径
+    subject_id INTEGER NOT NULL REFERENCES subjects(id) ON DELETE RESTRICT,
+    grade_id INTEGER NOT NULL REFERENCES grades(id) ON DELETE RESTRICT,
+    knowledge_point_id INTEGER NOT NULL REFERENCES knowledge_points(id) ON DELETE RESTRICT,
+    question_type_id INTEGER REFERENCES question_types(id) ON DELETE SET NULL,
+    difficulty_id INTEGER REFERENCES difficulty_levels(id) ON DELETE SET NULL,
+    status VARCHAR(20) DEFAULT '已发布' CHECK (status IN ('未处理', '已标注', '已审核', '已发布')),
+    tags TEXT[], -- 额外标签（数组格式）
+    remarks TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    updated_by VARCHAR(100)
+);
+
+CREATE INDEX idx_learning_videos_subject ON learning_videos(subject_id);
+CREATE INDEX idx_learning_videos_grade ON learning_videos(grade_id);
+CREATE INDEX idx_learning_videos_knowledge_point ON learning_videos(knowledge_point_id);
+CREATE INDEX idx_learning_videos_status ON learning_videos(status);
+CREATE INDEX idx_learning_videos_created_at ON learning_videos(created_at);
+
 -- 插入基础数据
 
 -- 学科数据

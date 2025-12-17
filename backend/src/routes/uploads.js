@@ -29,11 +29,9 @@ const storage = multer.diskStorage({
   }
 });
 
-// 文件过滤器
-const fileFilter = (req, file, cb) => {
-  // 检查文件类型
+// 图片文件过滤器
+const imageFileFilter = (req, file, cb) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-  
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
@@ -41,17 +39,36 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// 创建 multer 实例
-const upload = multer({
+// 视频文件过滤器（目前只允许 mp4）
+const videoFileFilter = (req, file, cb) => {
+  const allowedTypes = ['video/mp4'];
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('只支持 MP4 格式的视频'), false);
+  }
+};
+
+// 创建 multer 实例（图片）
+const uploadImage = multer({
   storage,
-  fileFilter,
+  fileFilter: imageFileFilter,
   limits: {
     fileSize: 50 * 1024 * 1024 // 50MB
   }
 });
 
+// 创建 multer 实例（视频）
+const uploadVideo = multer({
+  storage,
+  fileFilter: videoFileFilter,
+  limits: {
+    fileSize: 20 * 1024 * 1024 // 20MB
+  }
+});
+
 // 单文件上传
-router.post('/image', upload.single('file'), async (req, res, next) => {
+router.post('/image', uploadImage.single('file'), async (req, res, next) => {
   try {
     console.log('📁 文件上传请求:', {
       hasFile: !!req.file,
@@ -104,8 +121,62 @@ router.post('/image', upload.single('file'), async (req, res, next) => {
   }
 });
 
+// 单文件上传（视频）
+router.post('/video', uploadVideo.single('file'), async (req, res, next) => {
+  try {
+    console.log('🎬 视频上传请求:', {
+      hasFile: !!req.file,
+      fileInfo: req.file ? {
+        filename: req.file.filename,
+        originalname: req.file.originalname,
+        size: req.file.size,
+        mimetype: req.file.mimetype,
+        destination: req.file.destination,
+        path: req.file.path
+      } : null
+    });
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: '请选择要上传的视频文件'
+      });
+    }
+
+    // 验证文件是否真的保存到了磁盘
+    try {
+      await fs.access(req.file.path);
+      console.log('✅ 视频已成功保存到:', req.file.path);
+    } catch (error) {
+      console.error('❌ 视频保存失败:', error);
+      return res.status(500).json({
+        success: false,
+        message: '视频保存失败'
+      });
+    }
+
+    const fileUrl = `/uploads/${req.file.filename}`;
+
+    res.json({
+      success: true,
+      message: '视频上传成功',
+      data: {
+        filename: req.file.filename,
+        originalname: req.file.originalname,
+        size: req.file.size,
+        url: fileUrl,
+        mimetype: req.file.mimetype
+      },
+      url: fileUrl // 兼容前端组件
+    });
+  } catch (error) {
+    console.error('❌ 视频上传错误:', error);
+    next(error);
+  }
+});
+
 // 批量文件上传
-router.post('/batch', upload.array('files', 10), async (req, res, next) => {
+router.post('/batch', uploadImage.array('files', 10), async (req, res, next) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({
@@ -235,7 +306,7 @@ router.use((error, req, res, next) => {
     if (error.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
         success: false,
-        message: '文件大小不能超过10MB'
+        message: '文件大小超过限制'
       });
     }
     if (error.code === 'LIMIT_FILE_COUNT') {

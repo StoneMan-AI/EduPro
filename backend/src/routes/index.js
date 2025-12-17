@@ -6,12 +6,14 @@ const questionRoutes = require('./questions');
 const knowledgePointRoutes = require('./knowledgePoints');
 const configRoutes = require('./config');
 const uploadRoutes = require('./uploads');
+const videoRoutes = require('./videos');
 
 // 注册路由
 router.use('/questions', questionRoutes);
 router.use('/knowledge-points', knowledgePointRoutes);
 router.use('/config', configRoutes);
 router.use('/uploads', uploadRoutes);
+router.use('/videos', videoRoutes);
 
 // API 根路径
 router.get('/', (req, res) => {
@@ -20,6 +22,7 @@ router.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       questions: '/api/questions',
+      videos: '/api/videos',
       knowledgePoints: '/api/knowledge-points',
       config: '/api/config',
       uploads: '/api/uploads'

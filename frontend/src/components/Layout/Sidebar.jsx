@@ -3,6 +3,7 @@ import { Layout, Menu } from 'antd'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
   FileTextOutlined,
+  VideoCameraOutlined,
   BookOutlined,
   SettingOutlined,
   CloudUploadOutlined,
@@ -16,6 +17,11 @@ const menuItems = [
     key: '/questions',
     icon: <FileTextOutlined />,
     label: '题目管理'
+  },
+  {
+    key: '/videos',
+    icon: <VideoCameraOutlined />,
+    label: '学习视频管理'
   },
   {
     key: '/knowledge-points',
