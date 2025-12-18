@@ -31,3 +31,4 @@ CREATE INDEX IF NOT EXISTS idx_learning_videos_status ON learning_videos(status)
 CREATE INDEX IF NOT EXISTS idx_learning_videos_created_at ON learning_videos(created_at);
 
 
+

@@ -75,22 +75,61 @@ function VideoForm({
     }
   )
 
+  // 初始化表单和状态
   useEffect(() => {
-    if (!visible) return
-
-    // 初始化下拉依赖
-    const initSubjectId = video?.subject_id ?? null
-    const initGradeId = video?.grade_id ?? null
-    setSelectedSubjectId(initSubjectId)
-    setSelectedGradeId(initGradeId)
-
-    // 初始化预览
-    setCoverFile(null)
-    setVideoFile(null)
-    setCoverPreview(video?.cover_image_url || '')
-    setVideoUrlPreview(video?.video_url || '')
-    setVideoNamePreview(video?.video_url ? video.video_url.split('/').pop() : '')
-  }, [visible, video])
+    if (visible) {
+      if (video) {
+        // 编辑模式：设置表单值和预览状态
+        form.setFieldsValue({
+          title: video.title || '',
+          subject_id: video.subject_id,
+          grade_id: video.grade_id,
+          knowledge_point_id: video.knowledge_point_id,
+          question_type_id: video.question_type_id,
+          difficulty_id: video.difficulty_id,
+          status: video.status,
+          remarks: video.remarks || ''
+        })
+        setSelectedSubjectId(video.subject_id)
+        setSelectedGradeId(video.grade_id)
+        setCoverPreview(video.cover_image_url || '')
+        setVideoUrlPreview(video.video_url || '')
+        setVideoNamePreview(video.video_url ? video.video_url.split('/').pop() : '')
+        setCoverFile(null)
+        setVideoFile(null)
+      } else {
+        // 新增模式：清空所有状态并重置表单
+        setSelectedSubjectId(null)
+        setSelectedGradeId(null)
+        setCoverPreview('')
+        setVideoUrlPreview('')
+        setVideoNamePreview('')
+        setCoverFile(null)
+        setVideoFile(null)
+        form.resetFields()
+        form.setFieldsValue({
+          title: '',
+          subject_id: undefined,
+          grade_id: undefined,
+          knowledge_point_id: undefined,
+          question_type_id: undefined,
+          difficulty_id: undefined,
+          status: '已发布',
+          remarks: ''
+        })
+      }
+    } else {
+      // 弹框关闭时，清空所有状态
+      setSelectedSubjectId(null)
+      setSelectedGradeId(null)
+      setCoverPreview('')
+      setVideoUrlPreview('')
+      setVideoNamePreview('')
+      setCoverFile(null)
+      setVideoFile(null)
+      form.resetFields()
+    }
+  }, [visible, video, form])
 
   const handleSubjectChange = (value) => {
     const subjectId = value || null
@@ -406,5 +445,6 @@ function VideoForm({
 }
 
 export default VideoForm
+
 
 
